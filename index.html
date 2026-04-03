@@ -1,84 +1,997 @@
 <!DOCTYPE html>
-<!-- Created By CodingNepal - www.codingnepalweb.com -->
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Awesome Quiz App </title>
-    <link rel="stylesheet" href="/assets/style.css">
-    <!-- FontAweome CDN Link for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c27;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --accent: #e8ff47;
+      --accent-dim: rgba(232,255,71,0.12);
+      --accent-glow: rgba(232,255,71,0.25);
+      --text: #f0f0f0;
+      --text-muted: #7a7a8e;
+      --correct: #4ade80;
+      --correct-bg: rgba(74,222,128,0.1);
+      --correct-border: rgba(74,222,128,0.3);
+      --wrong: #f87171;
+      --wrong-bg: rgba(248,113,113,0.1);
+      --wrong-border: rgba(248,113,113,0.3);
+      --danger: #ff6b35;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridScroll 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes gridScroll {
+      0% { transform: translate(0,0); }
+      100% { transform: translate(40px, 40px); }
+    }
+
+    /* Glow orbs */
+    body::after {
+      content: '';
+      position: fixed;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(232,255,71,0.06) 0%, transparent 70%);
+      top: -200px; left: -200px;
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat 8s ease-in-out infinite alternate;
+    }
+    @keyframes orbFloat {
+      from { transform: translate(0,0); }
+      to { transform: translate(100px, 80px); }
+    }
+
+    /* ===================== LAYOUT WRAPPER ===================== */
+    .screen {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 1;
+      width: 90vw;
+      max-width: 560px;
+    }
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* ===================== START SCREEN ===================== */
+    #start-screen {
+      text-align: center;
+    }
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .logo-icon {
+      width: 48px; height: 48px;
+      background: var(--accent);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #0a0a0f;
+    }
+    .logo-text {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 42px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .start-tagline {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      letter-spacing: 0.5px;
+    }
+    .start-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .rules-title {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .rule-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: #c8c8d8;
+      line-height: 1.5;
+    }
+    .rule-item:last-child { border-bottom: none; }
+    .rule-num {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(232,255,71,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .btn-start {
+      width: 100%;
+      height: 56px;
+      background: var(--accent);
+      color: #0a0a0f;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 22px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+    .btn-start:active { transform: scale(0.98); }
+
+    /* ===================== QUIZ BOX ===================== */
+    #quiz-screen {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .quiz-header {
+      padding: 20px 24px 0;
+    }
+    .quiz-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .q-counter {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .q-counter span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .timer-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .timer-pill.danger {
+      background: rgba(255,107,53,0.12);
+      border-color: rgba(255,107,53,0.3);
+      color: var(--danger);
+      animation: timerPulse 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes timerPulse {
+      from { box-shadow: none; }
+      to { box-shadow: 0 0 12px rgba(255,107,53,0.3); }
+    }
+    .timer-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1s step-end infinite;
+    }
+    .timer-pill.danger .timer-dot { background: var(--danger); }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Progress bar */
+    .progress-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* Timer line (repurposed as a visual bar) */
+    .timer-track {
+      margin-top: 14px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--accent);
+      border-radius: 1px;
+      transform-origin: left;
+      transition: background 0.3s;
+    }
+    .timer-fill.danger { background: var(--danger); }
+
+    /* Question */
+    .question-body {
+      padding: 24px 24px 16px;
+    }
+    .question-text {
+      font-size: 19px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--text);
+      min-height: 60px;
+    }
+
+    /* Options */
+    .options-list {
+      padding: 0 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 15px;
+    }
+    .option:hover:not(.disabled) {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      transform: translateX(4px);
+    }
+    .option:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .option.correct {
+      background: var(--correct-bg);
+      border-color: var(--correct-border);
+      color: var(--correct);
+    }
+    .option.incorrect {
+      background: var(--wrong-bg);
+      border-color: var(--wrong-border);
+      color: var(--wrong);
+    }
+    .option.disabled { pointer-events: none; }
+    .option-label {
+      width: 26px; height: 26px;
+      border-radius: 7px;
+      background: var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .option:hover:not(.disabled) .option-label {
+      background: var(--accent);
+      color: #0a0a0f;
+    }
+    .option.correct .option-label { background: var(--correct); color: #0a0a0f; }
+    .option.incorrect .option-label { background: var(--wrong); color: #0a0a0f; }
+    .option-icon { font-size: 14px; }
+
+    /* Footer */
+    .quiz-footer {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .score-badge strong {
+      color: var(--accent);
+      font-size: 18px;
+      font-family: 'Bebas Neue', cursive;
+      letter-spacing: 1px;
+    }
+    .btn-next {
+      height: 44px;
+      padding: 0 22px;
+      background: var(--accent);
+      color: #0a0a0f;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.9);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-next.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+    .btn-next:hover { box-shadow: 0 4px 20px var(--accent-glow); }
+
+    /* ===================== RESULT BOX ===================== */
+    #result-screen {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .result-trophy {
+      font-size: 64px;
+      margin-bottom: 16px;
+      animation: trophyDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes trophyDrop {
+      from { transform: translateY(-30px) scale(0.5); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .result-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 38px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .result-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    /* Score ring */
+    .score-ring-wrap {
+      position: relative;
+      width: 140px; height: 140px;
+      margin: 0 auto 28px;
+    }
+    .score-ring-wrap svg { transform: rotate(-90deg); }
+    .score-ring-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
+    .score-ring-fill {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 0 339.3;
+      transition: stroke-dasharray 1s ease;
+    }
+    .score-ring-fill.good { stroke: var(--correct); }
+    .score-ring-fill.bad { stroke: var(--wrong); }
+    .score-ring-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+    }
+    .score-num {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 44px;
+      letter-spacing: 2px;
+      color: var(--text);
+      line-height: 1;
+    }
+    .score-denom {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Answer review */
+    .review-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-bottom: 28px;
+      padding-right: 4px;
+    }
+    .review-list::-webkit-scrollbar { width: 4px; }
+    .review-list::-webkit-scrollbar-track { background: transparent; }
+    .review-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+    .review-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      text-align: left;
+    }
+    .review-icon {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .review-icon.c { background: var(--correct-bg); color: var(--correct); border: 1px solid var(--correct-border); }
+    .review-icon.w { background: var(--wrong-bg); color: var(--wrong); border: 1px solid var(--wrong-border); }
+    .review-q { font-size: 13px; color: #c8c8d8; line-height: 1.4; }
+    .review-ans { font-size: 12px; margin-top: 3px; }
+    .review-ans.correct { color: var(--correct); }
+    .review-ans.wrong { color: var(--wrong); }
+
+    .result-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-restart, .btn-quit {
+      flex: 1;
+      height: 50px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-restart {
+      background: var(--accent);
+      color: #0a0a0f;
+    }
+    .btn-restart:hover { box-shadow: 0 4px 24px var(--accent-glow); transform: translateY(-1px); }
+    .btn-quit {
+      background: var(--surface2);
+      border: 1px solid var(--border2) !important;
+      color: var(--text-muted);
+    }
+    .btn-quit:hover { color: var(--text); border-color: var(--border2); }
+
+    /* ===================== STREAK ===================== */
+    .streak-popup {
+      position: fixed;
+      top: 24px; right: 24px;
+      background: var(--surface);
+      border: 1px solid rgba(232,255,71,0.3);
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+    .streak-popup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===================== CONFIRM MODAL ===================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 32px;
+      width: 340px;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-overlay.show .modal-box { transform: scale(1); }
+    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-btn {
+      flex: 1; height: 44px; border-radius: 10px; border: none;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 600; transition: all 0.2s;
+    }
+    .modal-confirm { background: var(--wrong-bg); border: 1px solid var(--wrong-border) !important; color: var(--wrong); }
+    .modal-cancel { background: var(--surface2); border: 1px solid var(--border2) !important; color: var(--text); }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 480px) {
+      .question-text { font-size: 16px; }
+      .option { font-size: 14px; padding: 12px 14px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- start Quiz button -->
-    <div class="start_btn"><button>Start Quiz</button></div>
 
-    <!-- Info Box -->
-    <div class="info_box">
-        <div class="info-title"><span>Some Rules of this Quiz</span></div>
-        <div class="info-list">
-            <div class="info">1. You will have only <span>15 seconds</span> per each question.</div>
-            <div class="info">2. Once you select your answer, it can't be undone.</div>
-            <div class="info">3. You can't select any option once time goes off.</div>
-            <div class="info">4. You can't exit from the Quiz while you're playing.</div>
-            <div class="info">5. You'll get points on the basis of your correct answers.</div>
-        </div>
-        <div class="buttons">
-            <button class="quit">Exit Quiz</button>
-            <button class="restart">Continue</button>
-        </div>
+  <!-- Streak popup -->
+  <div class="streak-popup" id="streak-popup">🔥 <span id="streak-num">2</span> STREAK!</div>
+
+  <!-- Exit confirm modal -->
+  <div class="modal-overlay" id="exit-modal">
+    <div class="modal-box">
+      <div class="modal-title">Quit the quiz?</div>
+      <div class="modal-sub">Your progress will be lost. Are you sure?</div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-confirm" id="modal-confirm">Yes, quit</button>
+        <button class="modal-btn modal-cancel" id="modal-cancel">Keep playing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== START SCREEN ========== -->
+  <div class="screen active" id="start-screen">
+    <div class="logo-mark">
+      <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+      <div class="logo-text">Quiz Arena</div>
+    </div>
+    <p class="start-tagline">Test your web dev knowledge. Beat the clock.</p>
+
+    <div class="start-card">
+      <div class="rules-title">How it works</div>
+      <div class="rule-item"><div class="rule-num">1</div><div>You have <strong>15 seconds</strong> per question — spend them wisely.</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div>Once you pick an answer, it's locked in.</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div>If time runs out, the correct answer is revealed.</div></div>
+      <div class="rule-item"><div class="rule-num">4</div><div>Chain correct answers for a <strong>streak bonus</strong>.</div></div>
+      <div class="rule-item"><div class="rule-num">5</div><div>Review every answer at the end.</div></div>
     </div>
 
-    <!-- Quiz Box -->
-    <div class="quiz_box">
-        <header>
-            <div class="title">Awesome Quiz Application</div>
-            <div class="timer">
-                <div class="time_left_txt">Time Left</div>
-                <div class="timer_sec">15</div>
-            </div>
-            <div class="time_line"></div>
-        </header>
-        <section>
-            <div class="que_text">
-                <!-- Here I've inserted question from JavaScript -->
-            </div>
-            <div class="option_list">
-                <!-- Here I've inserted options from JavaScript -->
-            </div>
-        </section>
+    <button class="btn-start" id="btn-start">
+      <i class="fas fa-play"></i> START QUIZ
+    </button>
+  </div>
 
-        <!-- footer of Quiz Box -->
-        <footer>
-            <div class="total_que">
-                <!-- Here I've inserted Question Count Number from JavaScript -->
-            </div>
-            <button class="next_btn">Next Question</button>
-        </footer>
+  <!-- ========== QUIZ SCREEN ========== -->
+  <div class="screen" id="quiz-screen">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <div class="q-counter">QUESTION <span id="q-num">1</span> OF <span id="q-total">6</span></div>
+        <div class="timer-pill" id="timer-pill">
+          <div class="timer-dot"></div>
+          <span id="timer-display">15</span>s
+        </div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="timer-track">
+        <div class="timer-fill" id="timer-fill"></div>
+      </div>
     </div>
 
-    <!-- Result Box -->
-    <div class="result_box">
-        <div class="icon">
-            <i class="fas fa-crown"></i>
-        </div>
-        <div class="complete_text">You've completed the Quiz!</div>
-        <div class="score_text">
-            <!-- Here I've inserted Score Result from JavaScript -->
-        </div>
-        <div class="buttons">
-            <button class="restart">restart Quiz</button>
-            <button class="quit">Quit Quiz</button>
-        </div>
+    <div class="question-body">
+      <div class="question-text" id="question-text"></div>
     </div>
 
-    <!-- Inside this JavaScript file I've inserted Questions and Options only -->
-    <script src="/assets/js/quiz.js"></script>
+    <div class="options-list" id="options-list"></div>
 
-    <!-- Inside this JavaScript file I've coded all Quiz Codes -->
-    <script src="/assets/js/script.js"></script>
+    <div class="quiz-footer">
+      <div class="score-badge">
+        <i class="fas fa-star" style="color: var(--accent); font-size: 12px;"></i>
+        <strong id="live-score">0</strong> pts
+      </div>
+      <button class="btn-next" id="btn-next" aria-label="Next question">
+        Next <i class="fas fa-arrow-right" style="font-size:12px;"></i>
+      </button>
+    </div>
+  </div>
 
+  <!-- ========== RESULT SCREEN ========== -->
+  <div class="screen" id="result-screen">
+    <div class="result-trophy" id="result-trophy">🏆</div>
+    <div class="result-title" id="result-title">COMPLETE!</div>
+    <div class="result-sub" id="result-sub">Here's how you did</div>
+
+    <div class="score-ring-wrap">
+      <svg width="140" height="140" viewBox="0 0 120 120">
+        <circle class="score-ring-bg" cx="60" cy="60" r="54"/>
+        <circle class="score-ring-fill" id="score-ring" cx="60" cy="60" r="54"/>
+      </svg>
+      <div class="score-ring-text">
+        <div class="score-num" id="score-num">0</div>
+        <div class="score-denom" id="score-denom">/ 6</div>
+      </div>
+    </div>
+
+    <div class="review-label">Answer breakdown</div>
+    <div class="review-list" id="review-list"></div>
+
+    <div class="result-actions">
+      <button class="btn-restart" id="btn-restart"><i class="fas fa-redo" style="margin-right:8px;font-size:13px;"></i>Play again</button>
+      <button class="btn-quit" id="btn-quit">Exit</button>
+    </div>
+  </div>
+
+<script>
+  // ===================== DATA =====================
+  const QUESTIONS = [
+    { question: "What does HTML stand for?", answer: "Hyper Text Markup Language", options: ["Hyper Text Preprocessor","Hyper Text Markup Language","Hyper Text Multiple Language","Hyper Tool Multi Language"] },
+    { question: "What does CSS stand for?", answer: "Cascading Style Sheet", options: ["Common Style Sheet","Colorful Style Sheet","Computer Style Sheet","Cascading Style Sheet"] },
+    { question: "What does PHP stand for?", answer: "Hypertext Preprocessor", options: ["Hypertext Preprocessor","Hypertext Programming","Hypertext Preprogramming","Hometext Preprocessor"] },
+    { question: "What does SQL stand for?", answer: "Structured Query Language", options: ["Stylish Question Language","Stylesheet Query Language","Statement Question Language","Structured Query Language"] },
+    { question: "What does XML stand for?", answer: "eXtensible Markup Language", options: ["eXtensible Markup Language","eXecutable Multiple Language","eXTra Multi-Program Language","eXamine Multiple Language"] },
+    { question: "What is React?", answer: "A Javascript library", options: ["A Javascript framework","A Javascript library","A frontend framework","A reactive framework for building web pages"] },
+  ];
+  const LABELS = ['A','B','C','D'];
+  const CONFIG = { timePerQuestion: 15 };
+
+  // ===================== STATE =====================
+  const state = {
+    qIndex: 0,
+    score: 0,
+    streak: 0,
+    timeLeft: CONFIG.timePerQuestion,
+    timer: null,
+    timerLine: null,
+    answered: false,
+    results: [],
+    shuffledOptions: [],
+  };
+
+  // ===================== DOM =====================
+  const $ = id => document.getElementById(id);
+  const screens = {
+    start: $('start-screen'),
+    quiz: $('quiz-screen'),
+    result: $('result-screen'),
+  };
+
+  function showScreen(name) {
+    Object.entries(screens).forEach(([k, el]) => el.classList.toggle('active', k === name));
+  }
+
+  // ===================== QUIZ LOGIC =====================
+  function shuffleArray(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+  }
+
+  function startQuiz() {
+    Object.assign(state, { qIndex:0, score:0, streak:0, answered:false, results:[] });
+    $('q-total').textContent = QUESTIONS.length;
+    $('score-denom').textContent = '/ ' + QUESTIONS.length;
+    loadQuestion();
+    showScreen('quiz');
+  }
+
+  function loadQuestion() {
+    state.answered = false;
+    const q = QUESTIONS[state.qIndex];
+    state.shuffledOptions = shuffleArray(q.options);
+
+    $('q-num').textContent = state.qIndex + 1;
+    $('question-text').textContent = q.question;
+    $('live-score').textContent = state.score;
+    $('btn-next').classList.remove('show');
+
+    // Progress bar
+    const pct = (state.qIndex / QUESTIONS.length) * 100;
+    $('progress-fill').style.width = pct + '%';
+
+    // Render options
+    const list = $('options-list');
+    list.innerHTML = '';
+    state.shuffledOptions.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'option';
+      div.tabIndex = 0;
+      div.setAttribute('role', 'button');
+      div.setAttribute('aria-label', `Option ${LABELS[i]}: ${opt}`);
+      div.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="option-label">${LABELS[i]}</div>
+          <span>${opt}</span>
+        </div>
+        <span class="option-icon"></span>
+      `;
+      div.addEventListener('click', () => selectOption(div, opt));
+      div.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') selectOption(div, opt); });
+      list.appendChild(div);
+    });
+
+    resetTimer();
+  }
+
+  function selectOption(el, chosen) {
+    if (state.answered) return;
+    state.answered = true;
+    clearInterval(state.timer);
+    clearInterval(state.timerLine);
+
+    const correct = QUESTIONS[state.qIndex].answer;
+    const isCorrect = chosen === correct;
+
+    // Record result
+    state.results.push({ question: QUESTIONS[state.qIndex].question, chosen, correct, isCorrect });
+
+    if (isCorrect) {
+      state.score++;
+      state.streak++;
+      el.classList.add('correct');
+      el.querySelector('.option-icon').innerHTML = '<i class="fas fa-check"></i>';
+      if (state.streak >= 2) showStreak(state.streak);
+    } else {
+      state.streak = 0;
+      el.classList.add('incorrect');
+      el.querySelector('.option-icon').innerHTML = '<i class="fas fa-times"></i>';
+      // Reveal correct
+      document.querySelectorAll('.option').forEach(opt => {
+        const txt = opt.querySelector('span:last-of-type') || opt.querySelectorAll('span')[1];
+        if (opt.querySelector('span + span') && getOptionText(opt) === correct) {
+          opt.classList.add('correct');
+          opt.querySelector('.option-icon').innerHTML = '<i class="fas fa-check"></i>';
+        }
+      });
+    }
+
+    // Disable all
+    document.querySelectorAll('.option').forEach(o => o.classList.add('disabled'));
+    $('live-score').textContent = state.score;
+    $('btn-next').classList.add('show');
+  }
+
+  function getOptionText(el) {
+    const spans = el.querySelectorAll('span');
+    return spans[spans.length - 1].textContent;
+  }
+
+  function nextQuestion() {
+    if (state.qIndex < QUESTIONS.length - 1) {
+      state.qIndex++;
+      loadQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  // ===================== TIMER =====================
+  function resetTimer() {
+    clearInterval(state.timer);
+    clearInterval(state.timerLine);
+    state.timeLeft = CONFIG.timePerQuestion;
+
+    const fill = $('timer-fill');
+    const pill = $('timer-pill');
+    fill.style.width = '100%';
+    fill.classList.remove('danger');
+    pill.classList.remove('danger');
+    $('timer-display').textContent = state.timeLeft;
+
+    // Smooth CSS timer line
+    fill.style.transition = 'none';
+    fill.style.width = '100%';
+    requestAnimationFrame(() => {
+      fill.style.transition = `width ${CONFIG.timePerQuestion}s linear`;
+      fill.style.width = '0%';
+    });
+
+    state.timer = setInterval(() => {
+      state.timeLeft--;
+      $('timer-display').textContent = state.timeLeft;
+
+      if (state.timeLeft <= 5) {
+        fill.classList.add('danger');
+        pill.classList.add('danger');
+      }
+
+      if (state.timeLeft <= 0) {
+        clearInterval(state.timer);
+        if (!state.answered) {
+          state.answered = true;
+          state.streak = 0;
+          // Reveal correct without penalizing
+          const correct = QUESTIONS[state.qIndex].answer;
+          state.results.push({ question: QUESTIONS[state.qIndex].question, chosen: null, correct, isCorrect: false });
+          document.querySelectorAll('.option').forEach(opt => {
+            opt.classList.add('disabled');
+            if (getOptionText(opt) === correct) {
+              opt.classList.add('correct');
+              opt.querySelector('.option-icon').innerHTML = '<i class="fas fa-check"></i>';
+            }
+          });
+          $('btn-next').classList.add('show');
+          $('timer-display').textContent = '00';
+        }
+      }
+    }, 1000);
+  }
+
+  // ===================== STREAK POPUP =====================
+  let streakTimeout;
+  function showStreak(n) {
+    clearTimeout(streakTimeout);
+    const popup = $('streak-popup');
+    $('streak-num').textContent = n;
+    popup.classList.add('show');
+    streakTimeout = setTimeout(() => popup.classList.remove('show'), 2000);
+  }
+
+  // ===================== RESULT =====================
+  function showResult() {
+    clearInterval(state.timer);
+    clearInterval(state.timerLine);
+
+    const total = QUESTIONS.length;
+    const pct = state.score / total;
+
+    // Trophy & title
+    if (pct === 1) {
+      $('result-trophy').textContent = '🏆';
+      $('result-title').textContent = 'PERFECT!';
+      $('result-sub').textContent = 'You got every question right!';
+    } else if (pct >= 0.6) {
+      $('result-trophy').textContent = '⚡';
+      $('result-title').textContent = 'WELL DONE!';
+      $('result-sub').textContent = 'Solid performance!';
+    } else {
+      $('result-trophy').textContent = '💡';
+      $('result-title').textContent = 'KEEP LEARNING';
+      $('result-sub').textContent = 'Review the answers below and try again.';
+    }
+
+    $('score-num').textContent = state.score;
+
+    // Animate score ring
+    const circumference = 2 * Math.PI * 54;
+    const filled = circumference * pct;
+    const ring = $('score-ring');
+    ring.style.strokeDasharray = `0 ${circumference}`;
+    ring.className = 'score-ring-fill' + (pct >= 0.6 ? ' good' : ' bad');
+    setTimeout(() => {
+      ring.style.strokeDasharray = `${filled} ${circumference}`;
+    }, 300);
+
+    // Review list
+    const list = $('review-list');
+    list.innerHTML = '';
+    state.results.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <div class="review-icon ${r.isCorrect ? 'c' : 'w'}">
+          <i class="fas fa-${r.isCorrect ? 'check' : 'times'}"></i>
+        </div>
+        <div>
+          <div class="review-q">${r.question}</div>
+          <div class="review-ans ${r.isCorrect ? 'correct' : 'wrong'}">
+            ${r.isCorrect ? '✓ ' + r.correct : (r.chosen ? '✗ You chose: ' + r.chosen + ' · ' : '⏱ Time out · ') + 'Correct: ' + r.correct}
+          </div>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+
+    showScreen('result');
+    $('progress-fill').style.width = '100%';
+  }
+
+  // ===================== EXIT CONFIRM =====================
+  function promptExit() {
+    $('exit-modal').classList.add('show');
+  }
+  $('modal-confirm').addEventListener('click', () => {
+    $('exit-modal').classList.remove('show');
+    clearInterval(state.timer);
+    clearInterval(state.timerLine);
+    showScreen('start');
+  });
+  $('modal-cancel').addEventListener('click', () => {
+    $('exit-modal').classList.remove('show');
+  });
+
+  // ===================== EVENT LISTENERS =====================
+  $('btn-start').addEventListener('click', startQuiz);
+  $('btn-next').addEventListener('click', nextQuestion);
+  $('btn-restart').addEventListener('click', startQuiz);
+  $('btn-quit').addEventListener('click', () => showScreen('start'));
+
+  // Keyboard: Escape to exit, 1-4 to pick option
+  document.addEventListener('keydown', e => {
+    if (screens.quiz.classList.contains('active')) {
+      if (e.key === 'Escape') promptExit();
+      const optionKeys = ['1','2','3','4'];
+      const idx = optionKeys.indexOf(e.key);
+      if (idx !== -1 && !state.answered) {
+        const opts = document.querySelectorAll('.option');
+        if (opts[idx]) opts[idx].click();
+      }
+      if ((e.key === 'Enter' || e.key === ' ') && $('btn-next').classList.contains('show')) {
+        e.preventDefault();
+        nextQuestion();
+      }
+    }
+  });
+</script>
 </body>
-</html>
 </html>
