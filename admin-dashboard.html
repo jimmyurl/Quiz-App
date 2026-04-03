@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Arena — HR Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --text-hint: #9a9a9a;
+  --accent: #1a1a1a;
+  --accent-inv: #ffffff;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --green-border: #bbf7d0;
+  --amber: #b45309;
+  --amber-bg: #fef3c7;
+  --amber-border: #fde68a;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --red-border: #fecaca;
+  --blue: #1d4ed8;
+  --blue-bg: #dbeafe;
+  --blue-border: #bfdbfe;
+  --sidebar-w: 220px;
+  --header-h: 60px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; font-size:14px; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--text);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  position: fixed; left:0; top:0; bottom:0;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 800;
+  color: #e8ff47;
+  letter-spacing: 2px;
+}
+.sidebar-logo-sub { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+.sidebar-company {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 10px;
+}
+.company-avatar {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: #e8ff47;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; color: #1a1a1a;
+  flex-shrink: 0;
+}
+.company-name { font-size: 13px; font-weight: 500; color: #fff; }
+.company-plan { font-size: 10px; color: rgba(255,255,255,0.4); }
+.nav { flex: 1; padding: 12px 0; }
+.nav-section { padding: 8px 20px 4px; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer; transition: all 0.15s;
+  font-size: 13px; font-weight: 400;
+  border-left: 2px solid transparent;
+}
+.nav-item:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+.nav-item.active { color: #fff; background: rgba(255,255,255,0.07); border-left-color: #e8ff47; }
+.nav-item i { width: 16px; text-align: center; font-size: 12px; }
+.nav-badge {
+  margin-left: auto; font-size: 10px; font-weight: 600;
+  background: #e8ff47; color: #1a1a1a;
+  padding: 1px 6px; border-radius: 999px;
+}
+.sidebar-footer {
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* ===== MAIN ===== */
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+  height: var(--header-h); background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; position: sticky; top: 0; z-index: 50;
+}
+.topbar-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.btn:hover { background: var(--surface2); }
+.btn-primary { background: var(--accent); color: var(--accent-inv); border-color: var(--accent); }
+.btn-primary:hover { background: #333; }
+.btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+.content { padding: 28px; flex: 1; }
+
+/* ===== VIEWS ===== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== STATS ROW ===== */
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+.stat-delta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.stat-delta.up { color: var(--green); }
+.stat-delta.down { color: var(--red); }
+
+/* ===== GRID LAYOUT ===== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.grid-3-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+/* ===== CARD ===== */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+.card-body { padding: 20px; }
+
+/* ===== TABLE ===== */
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); padding: 10px 16px; text-align: left; background: var(--surface2); border-bottom: 1px solid var(--border); }
+.table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: var(--surface2); }
+
+/* ===== BADGES ===== */
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); }
+.badge-gray { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+
+/* ===== PROGRESS BAR ===== */
+.prog-wrap { display: flex; align-items: center; gap: 10px; }
+.prog-bar { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.prog-fill.green { background: var(--green); }
+.prog-fill.amber { background: #f59e0b; }
+.prog-fill.red { background: var(--red); }
+.prog-pct { font-size: 12px; font-weight: 600; min-width: 32px; text-align: right; }
+
+/* ===== AVATAR ===== */
+.emp-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+
+/* ===== DEPT CARDS ===== */
+.dept-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.dept-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 18px; cursor: pointer; transition: all 0.15s; position: relative;
+}
+.dept-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.dept-card.active-dept { border-color: var(--text); border-width: 2px; }
+.dept-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 12px; }
+.dept-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.dept-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+.dept-prog { }
+.dept-actions { display: flex; gap: 6px; margin-top: 14px; }
+
+/* ===== QUIZ BUILDER ===== */
+.builder-layout { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
+.q-list { display: flex; flex-direction: column; gap: 10px; }
+.q-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; transition: border-color 0.15s; cursor: pointer;
+}
+.q-item:hover { border-color: var(--border2); }
+.q-item.active-q { border-color: var(--text); }
+.q-num { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.q-text { font-size: 14px; font-weight: 500; margin-bottom: 10px; line-height: 1.4; }
+.q-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.q-opt {
+  font-size: 12px; padding: 6px 10px; border-radius: 7px;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
+}
+.q-opt.correct { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+.q-opt-label { font-weight: 700; font-size: 10px; }
+.add-q-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  height: 52px; border: 2px dashed var(--border2); border-radius: 12px;
+  background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; width: 100%;
+}
+.add-q-btn:hover { border-color: var(--text); color: var(--text); background: var(--surface2); }
+.settings-panel { display: flex; flex-direction: column; gap: 12px; }
+.settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+.settings-title { font-family:'Syne',sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+.form-group { margin-bottom: 12px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; height: 38px; border-radius: 8px;
+  border: 1px solid var(--border2); background: var(--surface2);
+  color: var(--text); padding: 0 12px; font-family:'DM Sans',sans-serif; font-size: 13px;
+  outline: none; transition: border-color 0.15s;
+}
+.form-input:focus, .form-select:focus { border-color: var(--text); }
+.form-textarea { height: 80px; padding: 10px 12px; resize: none; line-height: 1.5; }
+.dept-checkboxes { display: flex; flex-direction: column; gap: 8px; }
+.dept-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; }
+.dept-checkbox input { accent-color: var(--text); width: 14px; height: 14px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+.toggle { position: relative; width: 36px; height: 20px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--border2); border-radius: 20px; transition: 0.2s; cursor: pointer; }
+.toggle-slider::before { content:''; position:absolute; width:14px;height:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.2s; }
+.toggle input:checked + .toggle-slider { background: var(--text); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+  z-index: 1000; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 18px; padding: 28px;
+  width: 480px; max-width: 95vw;
+  animation: modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes modalIn { from{transform:scale(0.9);opacity:0} to{transform:scale(1);opacity:1} }
+.modal-title { font-family:'Syne',sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+/* ===== MINI CHART ===== */
+.mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 48px; }
+.bar { flex: 1; border-radius: 3px 3px 0 0; background: var(--surface2); transition: height 0.5s ease; min-width: 8px; }
+.bar.filled { background: var(--text); }
+.week-labels { display: flex; gap: 4px; margin-top: 4px; }
+.week-label { flex: 1; font-size: 9px; text-align: center; color: var(--text-hint); }
+
+/* ===== ACTIVITY FEED ===== */
+.activity-list { display: flex; flex-direction: column; }
+.activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.activity-text { font-size: 13px; line-height: 1.5; flex: 1; }
+.activity-text strong { font-weight: 600; }
+.activity-time { font-size: 11px; color: var(--text-hint); white-space: nowrap; }
+
+/* ===== SCORE HEATMAP ===== */
+.heatmap { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.hm-cell { aspect-ratio: 1; border-radius: 4px; cursor: pointer; transition: transform 0.1s; }
+.hm-cell:hover { transform: scale(1.2); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: var(--accent-inv);
+  padding: 12px 18px; border-radius: 10px; font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+  transform: translateY(80px); opacity: 0; transition: all 0.3s;
+  z-index: 9999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state { text-align: center; padding: 48px 24px; }
+.empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.3; }
+.empty-title { font-family:'Syne',sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.empty-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .grid-2, .grid-3-1, .builder-layout { grid-template-columns: 1fr; }
+  .dept-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-text">QUIZ ARENA</div>
+    <div class="sidebar-logo-sub">HR Admin Panel</div>
+  </div>
+  <div class="sidebar-company">
+    <div class="company-avatar">AT</div>
+    <div>
+      <div class="company-name">Acme Tanzania</div>
+      <div class="company-plan">Business Plan</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="showView('overview',this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+    <div class="nav-item" onclick="showView('scores',this)"><i class="fas fa-users"></i> Employee Scores <span class="nav-badge">3</span></div>
+    <div class="nav-section">Management</div>
+    <div class="nav-item" onclick="showView('departments',this)"><i class="fas fa-sitemap"></i> Departments</div>
+    <div class="nav-item" onclick="showView('builder',this)"><i class="fas fa-layer-group"></i> Quiz Builder</div>
+    <div class="nav-item" onclick="showView('assignments',this)"><i class="fas fa-tasks"></i> Assignments</div>
+    <div class="nav-section">Settings</div>
+    <div class="nav-item" onclick="showView('settings',this)"><i class="fas fa-cog"></i> Settings</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-avatar">FM</div>
+    <div class="user-info">
+      <div class="user-name">Fatuma Mwamba</div>
+      <div class="user-role">HR Manager</div>
+    </div>
+    <i class="fas fa-sign-out-alt" style="color:rgba(255,255,255,0.25);font-size:12px;cursor:pointer;"></i>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-actions">
+      <div style="font-size:12px;color:var(--text-muted);background:var(--surface2);padding:4px 12px;border-radius:999px;border:1px solid var(--border);">
+        <i class="fas fa-circle" style="color:var(--green);font-size:7px;margin-right:5px;"></i>All systems live
+      </div>
+      <button class="btn btn-primary" onclick="openModal('add-employee-modal')">
+        <i class="fas fa-plus"></i> Add Employee
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== OVERVIEW ===== -->
+    <div class="view active" id="view-overview">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total employees</div>
+          <div class="stat-value">247</div>
+          <div class="stat-delta up"><i class="fas fa-arrow-up" style="font-size:9px;"></i> 12 this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg. pass rate</div>
+          <div class="stat-value">78%</div>
+          <div class="stat-delta up"><i class="fas fa-arrow-up" style="font-size:9px;"></i> +4% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Quizzes active</div>
+          <div class="stat-value">14</div>
+          <div class="stat-delta" style="color:var(--text-muted);">across 5 departments</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Completions today</div>
+          <div class="stat-value">31</div>
+          <div class="stat-delta down"><i class="fas fa-arrow-down" style="font-size:9px;"></i> 8 fewer than yesterday</div>
+        </div>
+      </div>
+
+      <div class="grid-3-1">
+        <!-- Department performance -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Department performance</div>
+            <button class="btn btn-sm" onclick="showView('departments',document.querySelector('[onclick*=departments]'))">View all</button>
+          </div>
+          <div style="padding:0;">
+            <table class="table">
+              <thead><tr><th>Department</th><th>Employees</th><th>Pass rate</th><th>Status</th></tr></thead>
+              <tbody id="dept-perf-table"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Activity -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent activity</div></div>
+          <div class="card-body" style="padding:0 20px;">
+            <div class="activity-list" id="activity-feed"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Weekly completions chart -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Weekly completions</div><span style="font-size:12px;color:var(--text-muted);">Last 8 weeks</span></div>
+          <div class="card-body">
+            <div class="mini-chart" id="weekly-chart"></div>
+            <div class="week-labels" id="weekly-labels"></div>
+          </div>
+        </div>
+        <!-- Top performers -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Top performers</div><button class="btn btn-sm" onclick="showView('scores',document.querySelector('[onclick*=scores]'))">Full report</button></div>
+          <div style="padding:0;">
+            <table class="table">
+              <thead><tr><th>Employee</th><th>Dept</th><th>Score</th></tr></thead>
+              <tbody id="top-performers-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EMPLOYEE SCORES ===== -->
+    <div class="view" id="view-scores">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input id="search-emp" class="form-input" placeholder="Search employees..." style="width:220px;" oninput="filterEmployees()"/>
+          <select class="form-select" id="filter-dept" style="width:160px;" onchange="filterEmployees()">
+            <option value="">All departments</option>
+          </select>
+          <select class="form-select" id="filter-status" style="width:140px;" onchange="filterEmployees()">
+            <option value="">All statuses</option>
+            <option value="pass">Passed</option>
+            <option value="fail">Failed</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+      <div class="card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Department</th>
+              <th>Quiz</th>
+              <th>Score</th>
+              <th>Progress</th>
+              <th>Completed</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="scores-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== DEPARTMENTS ===== -->
+    <div class="view" id="view-departments">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:13px;color:var(--text-muted);">Manage departments and their assigned quizzes</div>
+        <button class="btn btn-primary" onclick="openModal('add-dept-modal')"><i class="fas fa-plus"></i> New Department</button>
+      </div>
+      <div class="dept-grid" id="dept-grid"></div>
+    </div>
+
+    <!-- ===== QUIZ BUILDER ===== -->
+    <div class="view" id="view-builder">
+      <div class="builder-layout">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;" id="builder-quiz-title">AML Compliance Training</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">6 questions · 15 sec each · Finance dept</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn" onclick="openModal('quiz-settings-modal')"><i class="fas fa-cog"></i> Settings</button>
+              <button class="btn btn-primary" onclick="saveQuiz()"><i class="fas fa-save"></i> Save quiz</button>
+            </div>
+          </div>
+          <div class="q-list" id="q-list"></div>
+          <button class="add-q-btn" onclick="addQuestion()" style="margin-top:10px;">
+            <i class="fas fa-plus"></i> Add question
+          </button>
+        </div>
+        <div class="settings-panel">
+          <div class="settings-card">
+            <div class="settings-title">Quiz library</div>
+            <div id="quiz-library" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:12px;justify-content:center;" onclick="openModal('new-quiz-modal')">
+              <i class="fas fa-plus"></i> New quiz
+            </button>
+          </div>
+          <div class="settings-card">
+            <div class="settings-title">Assign to departments</div>
+            <div class="dept-checkboxes" id="assign-depts"></div>
+          </div>
+          <div class="settings-card">
+            <div class="settings-title">Quiz options</div>
+            <div class="toggle-row"><span>Shuffle questions</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><span>Shuffle answers</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><span>Show results immediately</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><span>Certificate on pass</span><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label">Pass mark (%)</label>
+              <input class="form-input" type="number" value="70" min="0" max="100"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Time per question (sec)</label>
+              <input class="form-input" type="number" value="15" min="5" max="120"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ASSIGNMENTS ===== -->
+    <div class="view" id="view-assignments">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:13px;color:var(--text-muted);">Control which quizzes are assigned to which departments</div>
+        <button class="btn btn-primary" onclick="openModal('assign-modal')"><i class="fas fa-link"></i> New assignment</button>
+      </div>
+      <div class="card">
+        <table class="table">
+          <thead><tr><th>Quiz</th><th>Department</th><th>Due date</th><th>Completion</th><th>Status</th><th></th></tr></thead>
+          <tbody id="assignments-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div class="view" id="view-settings">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Company settings</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+            <div class="form-group"><label class="form-label">Company name</label><input class="form-input" value="Acme Tanzania Ltd"/></div>
+            <div class="form-group"><label class="form-label">Industry</label><select class="form-select"><option>Financial Services</option><option>Telecommunications</option><option>Manufacturing</option><option>NGO / Development</option><option>Government</option><option>Healthcare</option></select></div>
+            <div class="form-group"><label class="form-label">Default quiz language</label><select class="form-select"><option>English</option><option>Swahili</option><option>Both (bilingual)</option></select></div>
+            <div class="form-group"><label class="form-label">HR contact email</label><input class="form-input" value="hr@acmetanzania.co.tz"/></div>
+            <button class="btn btn-primary" onclick="showToast('Settings saved successfully')">Save changes</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Notifications</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+            <div class="toggle-row"><span>Email on quiz completion</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><span>Weekly summary report</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><span>Alert on failed attempts</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><span>Reminder 2 days before due</span><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><span>New employee notifications</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Subscription</div></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;">Business Plan</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px;">TZS 150,000 / month</div></div>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Next billing: <strong style="color:var(--text);">May 3, 2026</strong> via M-Pesa</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn">Manage billing</button>
+              <button class="btn btn-primary">Upgrade to Enterprise</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Danger zone</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+            <div style="font-size:13px;color:var(--text-muted);">These actions are irreversible. Proceed with caution.</div>
+            <button class="btn" style="color:var(--red);border-color:var(--red-border);justify-content:flex-start;"><i class="fas fa-trash"></i> Delete all quiz results</button>
+            <button class="btn" style="color:var(--red);border-color:var(--red-border);justify-content:flex-start;"><i class="fas fa-ban"></i> Deactivate company account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add Employee -->
+<div class="modal-overlay" id="add-employee-modal">
+  <div class="modal">
+    <div class="modal-title">Add employee</div>
+    <div class="modal-sub">They'll receive an email invite to join Quiz Arena.</div>
+    <div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="new-emp-name" placeholder="e.g. Grace Kimani"/></div>
+    <div class="form-group"><label class="form-label">Email address</label><input class="form-input" id="new-emp-email" placeholder="grace@company.co.tz"/></div>
+    <div class="form-group"><label class="form-label">Department</label>
+      <select class="form-select" id="new-emp-dept"></select>
+    </div>
+    <div class="form-group"><label class="form-label">Role</label>
+      <select class="form-select"><option>Employee</option><option>Team Lead</option><option>Manager</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('add-employee-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addEmployee()"><i class="fas fa-paper-plane"></i> Send invite</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Department -->
+<div class="modal-overlay" id="add-dept-modal">
+  <div class="modal">
+    <div class="modal-title">New department</div>
+    <div class="modal-sub">Create a department to group employees and assign quizzes.</div>
+    <div class="form-group"><label class="form-label">Department name</label><input class="form-input" id="new-dept-name" placeholder="e.g. Customer Service"/></div>
+    <div class="form-group"><label class="form-label">Department head</label><input class="form-input" placeholder="e.g. Joseph Makamu"/></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" placeholder="Brief description of this department..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('add-dept-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addDepartment()">Create department</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Quiz -->
+<div class="modal-overlay" id="new-quiz-modal">
+  <div class="modal">
+    <div class="modal-title">New quiz</div>
+    <div class="modal-sub">You can add questions after creating the quiz.</div>
+    <div class="form-group"><label class="form-label">Quiz title</label><input class="form-input" id="new-quiz-title" placeholder="e.g. Data Protection Policy 2026"/></div>
+    <div class="form-group"><label class="form-label">Category</label>
+      <select class="form-select" id="new-quiz-cat">
+        <option>Compliance</option><option>HR Policy</option><option>Product Knowledge</option><option>Customer Service</option><option>IT Security</option><option>Finance</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" placeholder="What will employees learn?"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('new-quiz-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createQuiz()">Create quiz</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Modal -->
+<div class="modal-overlay" id="assign-modal">
+  <div class="modal">
+    <div class="modal-title">Assign quiz to department</div>
+    <div class="modal-sub">Set a due date and the department will be notified.</div>
+    <div class="form-group"><label class="form-label">Select quiz</label>
+      <select class="form-select" id="assign-quiz"></select>
+    </div>
+    <div class="form-group"><label class="form-label">Select department</label>
+      <select class="form-select" id="assign-dept-sel"></select>
+    </div>
+    <div class="form-group"><label class="form-label">Due date</label><input class="form-input" type="date" id="assign-due"/></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('assign-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createAssignment()">Assign quiz</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<script>
+// ===== DATA =====
+const DEPTS = [
+  { id:1, name:'Finance', icon:'💰', color:'#dcfce7', head:'Daniel Mushi', employees:42, passRate:82 },
+  { id:2, name:'HR & Admin', icon:'👥', color:'#dbeafe', head:'Fatuma Mwamba', employees:18, passRate:91 },
+  { id:3, name:'IT & Systems', icon:'💻', color:'#fef3c7', head:'Kevin Osoro', employees:31, passRate:76 },
+  { id:4, name:'Customer Service', icon:'🎧', color:'#fce7f3', head:'Amina Salum', employees:67, passRate:68 },
+  { id:5, name:'Sales', icon:'📈', color:'#ede9fe', head:'James Mbeki', employees:54, passRate:74 },
+  { id:6, name:'Operations', icon:'⚙️', color:'#ffedd5', head:'Ruth Katavi', employees:35, passRate:80 },
+];
+
+const EMPLOYEES = [
+  { name:'Grace Kimani', dept:'Finance', quiz:'AML Compliance', score:92, pct:92, date:'Apr 2, 2026', status:'pass' },
+  { name:'Baraka Mwangi', dept:'IT & Systems', quiz:'Cybersecurity Basics', score:88, pct:88, date:'Apr 2, 2026', status:'pass' },
+  { name:'Amina Hassan', dept:'Customer Service', quiz:'Customer Handling', score:61, pct:61, date:'Apr 1, 2026', status:'fail' },
+  { name:'John Oduya', dept:'Sales', quiz:'Product Knowledge', score:79, pct:79, date:'Apr 1, 2026', status:'pass' },
+  { name:'Zawadi Mchome', dept:'HR & Admin', quiz:'Data Protection', score:95, pct:95, date:'Apr 1, 2026', status:'pass' },
+  { name:'Peter Lema', dept:'Finance', quiz:'AML Compliance', score:55, pct:55, date:'Mar 31, 2026', status:'fail' },
+  { name:'Neema Kimaro', dept:'Operations', quiz:'Safety Procedures', score:83, pct:83, date:'Mar 31, 2026', status:'pass' },
+  { name:'David Shirima', dept:'Customer Service', quiz:'Customer Handling', score:0, pct:0, date:'—', status:'pending' },
+  { name:'Salma Juma', dept:'IT & Systems', quiz:'Cybersecurity Basics', score:72, pct:72, date:'Mar 30, 2026', status:'pass' },
+  { name:'Michael Temba', dept:'Sales', quiz:'Product Knowledge', score:68, pct:68, date:'Mar 30, 2026', status:'pass' },
+  { name:'Lucy Mwita', dept:'Finance', quiz:'AML Compliance', score:44, pct:44, date:'Mar 29, 2026', status:'fail' },
+  { name:'Hassan Ally', dept:'HR & Admin', quiz:'Data Protection', score:0, pct:0, date:'—', status:'pending' },
+];
+
+const QUIZZES = [
+  { id:1, title:'AML Compliance Training', category:'Compliance', questions:12 },
+  { id:2, title:'Cybersecurity Basics', category:'IT Security', questions:10 },
+  { id:3, title:'Customer Handling Excellence', category:'Customer Service', questions:8 },
+  { id:4, title:'Data Protection Policy', category:'HR Policy', questions:15 },
+  { id:5, title:'Product Knowledge 2026', category:'Product Knowledge', questions:20 },
+  { id:6, title:'Workplace Safety Procedures', category:'Compliance', questions:9 },
+];
+
+const ASSIGNMENTS = [
+  { quiz:'AML Compliance Training', dept:'Finance', due:'Apr 15, 2026', completion:71, status:'active' },
+  { quiz:'Cybersecurity Basics', dept:'IT & Systems', due:'Apr 10, 2026', completion:55, status:'active' },
+  { quiz:'Customer Handling Excellence', dept:'Customer Service', due:'Apr 8, 2026', completion:38, status:'urgent' },
+  { quiz:'Data Protection Policy', dept:'HR & Admin', due:'May 1, 2026', completion:89, status:'active' },
+  { quiz:'Product Knowledge 2026', dept:'Sales', due:'Mar 31, 2026', completion:100, status:'complete' },
+  { quiz:'Workplace Safety Procedures', dept:'Operations', due:'Apr 20, 2026', completion:62, status:'active' },
+];
+
+const SAMPLE_QUESTIONS = [
+  { text:'What does AML stand for in financial compliance?', opts:['Anti-Money Laundering','Asset Management Law','Annual Monetary Limit','Authorized Market Liaison'], correct:0 },
+  { text:'Which of the following is a red flag for money laundering?', opts:['Regular monthly salary deposits','Large cash deposits with no explanation','Receiving a bank transfer from employer','Paying bills online'], correct:1 },
+  { text:'How long must AML records be kept according to regulations?', opts:['1 year','3 years','5 years','10 years'], correct:2 },
+];
+
+const ACTIVITY = [
+  { color:'#16a34a', text:'<strong>Grace Kimani</strong> passed AML Compliance with 92%', time:'2h ago' },
+  { color:'#dc2626', text:'<strong>Peter Lema</strong> failed AML Compliance (55%)', time:'4h ago' },
+  { color:'#1d4ed8', text:'<strong>HR Admin</strong> assigned Data Protection to 18 employees', time:'6h ago' },
+  { color:'#16a34a', text:'<strong>Zawadi Mchome</strong> passed Data Protection with 95%', time:'8h ago' },
+  { color:'#b45309', text:'Customer Service completion rate dropped below 70%', time:'1d ago' },
+  { color:'#1d4ed8', text:'<strong>3 new employees</strong> added to Finance dept', time:'1d ago' },
+];
+
+const WEEKLY = [28,35,22,41,38,52,47,31];
+
+// Avatar colors
+const AVATAR_COLORS = [
+  ['#dcfce7','#15803d'],['#dbeafe','#1e40af'],['#fef3c7','#92400e'],
+  ['#fce7f3','#9d174d'],['#ede9fe','#6d28d9'],['#ffedd5','#c2410c'],
+];
+function avatarColor(i) { return AVATAR_COLORS[i % AVATAR_COLORS.length]; }
+function initials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+// ===== NAVIGATION =====
+function showView(name, navEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  const titles = { overview:'Dashboard', scores:'Employee Scores', departments:'Departments', builder:'Quiz Builder', assignments:'Assignments', settings:'Settings' };
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+}
+
+// ===== RENDER OVERVIEW =====
+function renderOverview() {
+  // Dept perf table
+  const tbody = document.getElementById('dept-perf-table');
+  tbody.innerHTML = DEPTS.map(d => {
+    const cls = d.passRate >= 80 ? 'green' : d.passRate >= 65 ? 'amber' : 'red';
+    const badge = d.passRate >= 80 ? 'badge-green' : d.passRate >= 65 ? 'badge-amber' : 'badge-red';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;">${d.icon} <strong>${d.name}</strong></div></td>
+      <td>${d.employees}</td>
+      <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill ${cls}" style="width:${d.passRate}%"></div></div><div class="prog-pct">${d.passRate}%</div></div></td>
+      <td><span class="badge ${badge}">${d.passRate >= 80 ? 'Good' : d.passRate >= 65 ? 'Needs work' : 'Critical'}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Activity
+  document.getElementById('activity-feed').innerHTML = ACTIVITY.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.color};"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>`).join('');
+
+  // Weekly chart
+  const max = Math.max(...WEEKLY);
+  const chartEl = document.getElementById('weekly-chart');
+  const labelsEl = document.getElementById('weekly-labels');
+  const weeks = ['Feb 3','Feb 10','Feb 17','Feb 24','Mar 3','Mar 10','Mar 17','Mar 24'];
+  chartEl.innerHTML = WEEKLY.map((v,i) => `<div class="bar ${i === WEEKLY.length-1 ? '' : 'filled'}" style="height:${Math.round((v/max)*100)}%;background:${i === WEEKLY.length-1 ? '#e8ff47' : i >= 4 ? '#1a1a1a' : '#d1d0ca'};"></div>`).join('');
+  labelsEl.innerHTML = weeks.map((w,i) => `<div class="week-label">${i % 2 === 0 ? w.split(' ')[1] : ''}</div>`).join('');
+
+  // Top performers
+  const sorted = [...EMPLOYEES].filter(e=>e.status==='pass').sort((a,b)=>b.score-a.score).slice(0,5);
+  document.getElementById('top-performers-table').innerHTML = sorted.map((e,i) => {
+    const [bg,fg] = avatarColor(i);
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;">
+        <div class="emp-avatar" style="background:${bg};color:${fg};">${initials(e.name)}</div>${e.name}
+      </div></td>
+      <td><span class="badge badge-gray">${e.dept}</span></td>
+      <td><strong>${e.score}%</strong></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== RENDER SCORES =====
+function renderScores() {
+  // Populate dept filter
+  const sel = document.getElementById('filter-dept');
+  sel.innerHTML = '<option value="">All departments</option>' + DEPTS.map(d=>`<option>${d.name}</option>`).join('');
+  filterEmployees();
+}
+
+function filterEmployees() {
+  const search = document.getElementById('search-emp').value.toLowerCase();
+  const dept = document.getElementById('filter-dept').value;
+  const status = document.getElementById('filter-status').value;
+  const filtered = EMPLOYEES.filter(e => {
+    const matchSearch = e.name.toLowerCase().includes(search) || e.quiz.toLowerCase().includes(search);
+    const matchDept = !dept || e.dept === dept;
+    const matchStatus = !status || e.status === status;
+    return matchSearch && matchDept && matchStatus;
+  });
+  renderScoresTable(filtered);
+}
+
+function renderScoresTable(data) {
+  const tbody = document.getElementById('scores-table');
+  if (!data.length) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">No results found</td></tr>`; return; }
+  tbody.innerHTML = data.map((e,i) => {
+    const [bg,fg] = avatarColor(i);
+    const cls = e.pct >= 70 ? 'green' : e.pct > 0 ? 'amber' : '';
+    const badge = e.status === 'pass' ? 'badge-green' : e.status === 'fail' ? 'badge-red' : 'badge-gray';
+    const badgeTxt = e.status === 'pass' ? 'Passed' : e.status === 'fail' ? 'Failed' : 'Pending';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px;">
+        <div class="emp-avatar" style="background:${bg};color:${fg};">${initials(e.name)}</div>
+        <strong>${e.name}</strong>
+      </div></td>
+      <td><span class="badge badge-gray">${e.dept}</span></td>
+      <td style="color:var(--text-muted);font-size:12px;">${e.quiz}</td>
+      <td><strong>${e.status === 'pending' ? '—' : e.score + '%'}</strong></td>
+      <td style="min-width:120px;"><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill ${cls}" style="width:${e.pct}%"></div></div><div class="prog-pct">${e.status === 'pending' ? '—' : e.pct + '%'}</div></div></td>
+      <td style="color:var(--text-muted);font-size:12px;">${e.date}</td>
+      <td><span class="badge ${badge}">${badgeTxt}</span></td>
+      <td><button class="btn btn-sm" onclick="showToast('Viewing ${e.name} profile')"><i class="fas fa-eye"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== RENDER DEPARTMENTS =====
+function renderDepartments() {
+  document.getElementById('dept-grid').innerHTML = DEPTS.map(d => {
+    const cls = d.passRate >= 80 ? 'green' : d.passRate >= 65 ? 'amber' : 'red';
+    const badge = d.passRate >= 80 ? 'badge-green' : d.passRate >= 65 ? 'badge-amber' : 'badge-red';
+    return `<div class="dept-card">
+      <div class="dept-icon" style="background:${d.color};">${d.icon}</div>
+      <div class="dept-name">${d.name}</div>
+      <div class="dept-meta">${d.employees} employees · Head: ${d.head}</div>
+      <div class="dept-prog">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:11px;color:var(--text-muted);">Pass rate</span>
+          <span class="badge ${badge}">${d.passRate}%</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill ${cls}" style="width:${d.passRate}%;"></div></div>
+      </div>
+      <div class="dept-actions">
+        <button class="btn btn-sm" style="flex:1;" onclick="showView('scores',document.querySelector('[onclick*=scores]'));setTimeout(()=>{document.getElementById('filter-dept').value='${d.name}';filterEmployees();},50)"><i class="fas fa-users"></i> Scores</button>
+        <button class="btn btn-sm" style="flex:1;" onclick="showToast('Assigning quiz to ${d.name}')"><i class="fas fa-tasks"></i> Assign</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER QUIZ BUILDER =====
+function renderBuilder() {
+  // Quiz library
+  document.getElementById('quiz-library').innerHTML = QUIZZES.map((q,i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s;" onclick="loadQuiz(${i})" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div>
+        <div style="font-size:13px;font-weight:500;">${q.title}</div>
+        <div style="font-size:11px;color:var(--text-muted);">${q.category} · ${q.questions}q</div>
+      </div>
+      <i class="fas fa-chevron-right" style="font-size:10px;color:var(--text-hint);"></i>
+    </div>`).join('');
+
+  // Assign depts checkboxes
+  document.getElementById('assign-depts').innerHTML = DEPTS.map((d,i) => `
+    <label class="dept-checkbox">
+      <input type="checkbox" ${i < 2 ? 'checked' : ''}/>
+      ${d.icon} ${d.name}
+    </label>`).join('');
+
+  renderQuestions();
+}
+
+function renderQuestions() {
+  document.getElementById('q-list').innerHTML = SAMPLE_QUESTIONS.map((q,qi) => `
+    <div class="q-item" onclick="document.querySelectorAll('.q-item').forEach(e=>e.classList.remove('active-q'));this.classList.add('active-q')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="q-num">Question ${qi+1}</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="event.stopPropagation();showToast('Question editing coming soon')"><i class="fas fa-pen"></i></button>
+          <button class="btn btn-sm" style="color:var(--red);" onclick="event.stopPropagation();removeQuestion(${qi})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="q-text">${q.text}</div>
+      <div class="q-opts">${q.opts.map((o,oi)=>`
+        <div class="q-opt ${oi===q.correct?'correct':''}">
+          <span class="q-opt-label">${['A','B','C','D'][oi]}</span>${o}
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function addQuestion() {
+  SAMPLE_QUESTIONS.push({ text:'New question — click to edit', opts:['Option A','Option B','Option C','Option D'], correct:0 });
+  renderQuestions();
+  showToast('Question added');
+}
+
+function removeQuestion(idx) {
+  SAMPLE_QUESTIONS.splice(idx, 1);
+  renderQuestions();
+  showToast('Question removed');
+}
+
+function loadQuiz(idx) {
+  document.getElementById('builder-quiz-title').textContent = QUIZZES[idx].title;
+  showToast('Loaded: ' + QUIZZES[idx].title);
+}
+
+function saveQuiz() { showToast('Quiz saved successfully'); }
+
+// ===== RENDER ASSIGNMENTS =====
+function renderAssignments() {
+  // Populate selects
+  document.getElementById('assign-quiz').innerHTML = QUIZZES.map(q=>`<option>${q.title}</option>`).join('');
+  document.getElementById('assign-dept-sel').innerHTML = DEPTS.map(d=>`<option>${d.name}</option>`).join('');
+  // Set default due date
+  const due = new Date(); due.setDate(due.getDate() + 14);
+  document.getElementById('assign-due').value = due.toISOString().split('T')[0];
+
+  document.getElementById('assignments-table').innerHTML = ASSIGNMENTS.map(a => {
+    const cls = a.completion >= 80 ? 'green' : a.completion >= 50 ? 'amber' : 'red';
+    const badge = a.status === 'complete' ? 'badge-green' : a.status === 'urgent' ? 'badge-red' : 'badge-blue';
+    const badgeTxt = a.status === 'complete' ? 'Complete' : a.status === 'urgent' ? 'Urgent' : 'Active';
+    return `<tr>
+      <td><strong>${a.quiz}</strong></td>
+      <td>${a.dept}</td>
+      <td style="color:var(--text-muted);font-size:12px;">${a.due}</td>
+      <td style="min-width:140px;"><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill ${cls}" style="width:${a.completion}%"></div></div><div class="prog-pct">${a.completion}%</div></div></td>
+      <td><span class="badge ${badge}">${badgeTxt}</span></td>
+      <td><div style="display:flex;gap:6px;">
+        <button class="btn btn-sm" onclick="showToast('Sending reminder to ${a.dept}')"><i class="fas fa-bell"></i></button>
+        <button class="btn btn-sm" onclick="showToast('Viewing ${a.quiz} report')"><i class="fas fa-chart-bar"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== MODALS =====
+function openModal(id) {
+  // Populate dept select in add-employee modal
+  if (id === 'add-employee-modal') {
+    document.getElementById('new-emp-dept').innerHTML = DEPTS.map(d=>`<option>${d.name}</option>`).join('');
+  }
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ===== ACTIONS =====
+function addEmployee() {
+  const name = document.getElementById('new-emp-name').value.trim();
+  const email = document.getElementById('new-emp-email').value.trim();
+  if (!name || !email) { showToast('Please fill in all fields'); return; }
+  closeModal('add-employee-modal');
+  showToast('Invite sent to ' + email);
+  document.getElementById('new-emp-name').value = '';
+  document.getElementById('new-emp-email').value = '';
+}
+
+function addDepartment() {
+  const name = document.getElementById('new-dept-name').value.trim();
+  if (!name) { showToast('Enter a department name'); return; }
+  DEPTS.push({ id: DEPTS.length+1, name, icon:'🏢', color:'#f0efe9', head:'—', employees:0, passRate:0 });
+  closeModal('add-dept-modal');
+  renderDepartments();
+  showToast('Department "' + name + '" created');
+  document.getElementById('new-dept-name').value = '';
+}
+
+function createQuiz() {
+  const title = document.getElementById('new-quiz-title').value.trim();
+  const cat = document.getElementById('new-quiz-cat').value;
+  if (!title) { showToast('Enter a quiz title'); return; }
+  QUIZZES.push({ id: QUIZZES.length+1, title, category:cat, questions:0 });
+  closeModal('new-quiz-modal');
+  renderBuilder();
+  document.getElementById('builder-quiz-title').textContent = title;
+  showToast('Quiz "' + title + '" created');
+  document.getElementById('new-quiz-title').value = '';
+}
+
+function createAssignment() {
+  closeModal('assign-modal');
+  const quiz = document.getElementById('assign-quiz').value;
+  const dept = document.getElementById('assign-dept-sel').value;
+  showToast('Quiz assigned to ' + dept);
+}
+
+function exportCSV() {
+  const rows = [['Employee','Department','Quiz','Score','Status','Date']];
+  EMPLOYEES.forEach(e => rows.push([e.name, e.dept, e.quiz, e.score+'%', e.status, e.date]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'quiz-scores-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showToast('CSV exported successfully');
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== INIT =====
+renderOverview();
+renderScores();
+renderDepartments();
+renderBuilder();
+renderAssignments();
+</script>
+</body>
+</html>
