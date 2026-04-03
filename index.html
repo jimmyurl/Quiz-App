@@ -9,989 +9,536 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root {
-      --bg: #0a0a0f;
-      --surface: #13131a;
-      --surface2: #1c1c27;
-      --border: rgba(255,255,255,0.07);
-      --border2: rgba(255,255,255,0.13);
-      --accent: #e8ff47;
-      --accent-dim: rgba(232,255,71,0.12);
-      --accent-glow: rgba(232,255,71,0.25);
-      --text: #f0f0f0;
-      --text-muted: #7a7a8e;
-      --correct: #4ade80;
-      --correct-bg: rgba(74,222,128,0.1);
-      --correct-border: rgba(74,222,128,0.3);
-      --wrong: #f87171;
-      --wrong-bg: rgba(248,113,113,0.1);
-      --wrong-border: rgba(248,113,113,0.3);
-      --danger: #ff6b35;
+      --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c27;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+      --accent:#e8ff47;--accent-dim:rgba(232,255,71,0.12);--accent-glow:rgba(232,255,71,0.25);
+      --text:#f0f0f0;--text-muted:#7a7a8e;
+      --correct:#4ade80;--correct-bg:rgba(74,222,128,0.1);--correct-border:rgba(74,222,128,0.3);
+      --wrong:#f87171;--wrong-bg:rgba(248,113,113,0.1);--wrong-border:rgba(248,113,113,0.3);
+      --danger:#ff6b35;--info:#60a5fa;--info-bg:rgba(96,165,250,0.1);--info-border:rgba(96,165,250,0.3);
     }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(232,255,71,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,255,71,0.03) 1px,transparent 1px);background-size:40px 40px;animation:gridScroll 20s linear infinite;pointer-events:none;z-index:0;}
+    @keyframes gridScroll{0%{transform:translate(0,0)}100%{transform:translate(40px,40px)}}
+    body::after{content:'';position:fixed;width:600px;height:600px;background:radial-gradient(circle,rgba(232,255,71,0.06) 0%,transparent 70%);top:-200px;left:-200px;pointer-events:none;z-index:0;animation:orbFloat 8s ease-in-out infinite alternate;}
+    @keyframes orbFloat{from{transform:translate(0,0)}to{transform:translate(100px,80px)}}
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    .screen{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);opacity:0;pointer-events:none;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);z-index:1;width:90vw;max-width:560px;}
+    .screen.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1);}
+    #pricing-screen{max-width:700px;max-height:92vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+    #pricing-screen::-webkit-scrollbar{width:4px;}
+    #pricing-screen::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
+    /* START */
+    #start-screen{text-align:center;}
+    .logo-mark{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
+    .logo-icon{width:48px;height:48px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#0a0a0f;}
+    .logo-text{font-family:'Bebas Neue',cursive;font-size:42px;letter-spacing:3px;color:var(--accent);line-height:1;}
+    .start-tagline{font-size:15px;color:var(--text-muted);margin-bottom:40px;letter-spacing:.5px;}
+    .start-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px;margin-bottom:16px;}
+    .rules-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:20px;}
+    .rule-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;color:#c8c8d8;line-height:1.5;}
+    .rule-item:last-child{border-bottom:none;}
+    .rule-num{width:24px;height:24px;border-radius:6px;background:var(--accent-dim);border:1px solid rgba(232,255,71,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--accent);flex-shrink:0;margin-top:1px;}
+    .btn-start{width:100%;height:56px;background:var(--accent);color:#0a0a0f;border:none;border-radius:14px;font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:3px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;}
+    .btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--accent-glow);}
+    .btn-pricing{width:100%;height:48px;background:transparent;border:1px solid var(--border2);border-radius:14px;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-pricing:hover{border-color:var(--accent);color:var(--accent);}
 
-    /* Animated background grid */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      animation: gridScroll 20s linear infinite;
-      pointer-events: none;
-      z-index: 0;
-    }
+    /* QUIZ */
+    #quiz-screen{background:var(--surface);border:1px solid var(--border2);border-radius:24px;overflow:hidden;}
+    .quiz-header{padding:20px 24px 0;}
+    .quiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .q-counter{font-size:12px;color:var(--text-muted);font-weight:500;letter-spacing:1px;}
+    .q-counter span{color:var(--accent);font-weight:600;}
+    .timer-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:100px;padding:6px 14px;font-size:13px;font-weight:600;transition:all .3s;}
+    .timer-pill.danger{background:rgba(255,107,53,0.12);border-color:rgba(255,107,53,0.3);color:var(--danger);animation:timerPulse .5s ease-in-out infinite alternate;}
+    @keyframes timerPulse{from{box-shadow:none}to{box-shadow:0 0 12px rgba(255,107,53,0.3)}}
+    .timer-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1s step-end infinite;}
+    .timer-pill.danger .timer-dot{background:var(--danger);}
+    @keyframes blink{50%{opacity:0}}
+    .progress-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+    .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;box-shadow:0 0 8px var(--accent-glow);}
+    .timer-track{margin-top:14px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;}
+    .timer-fill{height:100%;width:100%;background:var(--accent);border-radius:1px;transform-origin:left;transition:background .3s;}
+    .timer-fill.danger{background:var(--danger);}
+    .question-body{padding:24px 24px 16px;}
+    .question-text{font-size:19px;font-weight:500;line-height:1.5;color:var(--text);min-height:60px;}
+    .options-list{padding:0 24px 16px;display:flex;flex-direction:column;gap:10px;}
+    .option{background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px 18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:15px;}
+    .option:hover:not(.disabled){border-color:var(--accent);background:var(--accent-dim);transform:translateX(4px);}
+    .option:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+    .option.correct{background:var(--correct-bg);border-color:var(--correct-border);color:var(--correct);}
+    .option.incorrect{background:var(--wrong-bg);border-color:var(--wrong-border);color:var(--wrong);}
+    .option.disabled{pointer-events:none;}
+    .option-label{width:26px;height:26px;border-radius:7px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-muted);flex-shrink:0;transition:all .2s;}
+    .option:hover:not(.disabled) .option-label{background:var(--accent);color:#0a0a0f;}
+    .option.correct .option-label{background:var(--correct);color:#0a0a0f;}
+    .option.incorrect .option-label{background:var(--wrong);color:#0a0a0f;}
+    .option-icon{font-size:14px;}
+    .quiz-footer{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);}
+    .score-badge{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);}
+    .score-badge strong{color:var(--accent);font-size:18px;font-family:'Bebas Neue',cursive;letter-spacing:1px;}
+    .btn-next{height:44px;padding:0 22px;background:var(--accent);color:#0a0a0f;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transform:scale(0.9);transition:all .25s cubic-bezier(0.34,1.56,0.64,1);}
+    .btn-next.show{opacity:1;pointer-events:auto;transform:scale(1);}
+    .btn-next:hover{box-shadow:0 4px 20px var(--accent-glow);}
 
-    @keyframes gridScroll {
-      0% { transform: translate(0,0); }
-      100% { transform: translate(40px, 40px); }
-    }
+    /* RESULT */
+    #result-screen{background:var(--surface);border:1px solid var(--border2);border-radius:24px;padding:40px 32px;text-align:center;}
+    .result-trophy{font-size:64px;margin-bottom:16px;animation:trophyDrop .6s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+    @keyframes trophyDrop{from{transform:translateY(-30px) scale(0.5);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+    .result-title{font-family:'Bebas Neue',cursive;font-size:38px;letter-spacing:4px;color:var(--accent);margin-bottom:6px;}
+    .result-sub{font-size:14px;color:var(--text-muted);margin-bottom:32px;}
+    .score-ring-wrap{position:relative;width:140px;height:140px;margin:0 auto 28px;}
+    .score-ring-wrap svg{transform:rotate(-90deg);}
+    .score-ring-bg{fill:none;stroke:var(--surface2);stroke-width:8;}
+    .score-ring-fill{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round;stroke-dasharray:0 339.3;transition:stroke-dasharray 1s ease;}
+    .score-ring-fill.good{stroke:var(--correct);}
+    .score-ring-fill.bad{stroke:var(--wrong);}
+    .score-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+    .score-num{font-family:'Bebas Neue',cursive;font-size:44px;letter-spacing:2px;color:var(--text);line-height:1;}
+    .score-denom{font-size:12px;color:var(--text-muted);}
+    .review-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;text-align:left;}
+    .review-list{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;margin-bottom:28px;padding-right:4px;}
+    .review-list::-webkit-scrollbar{width:4px;}
+    .review-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+    .review-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;text-align:left;}
+    .review-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:2px;}
+    .review-icon.c{background:var(--correct-bg);color:var(--correct);border:1px solid var(--correct-border);}
+    .review-icon.w{background:var(--wrong-bg);color:var(--wrong);border:1px solid var(--wrong-border);}
+    .review-q{font-size:13px;color:#c8c8d8;line-height:1.4;}
+    .review-ans{font-size:12px;margin-top:3px;}
+    .review-ans.correct{color:var(--correct);}
+    .review-ans.wrong{color:var(--wrong);}
+    .result-actions{display:flex;gap:10px;}
+    .btn-restart,.btn-quit{flex:1;height:50px;border-radius:12px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;transition:all .2s;}
+    .btn-restart{background:var(--accent);color:#0a0a0f;}
+    .btn-restart:hover{box-shadow:0 4px 24px var(--accent-glow);transform:translateY(-1px);}
+    .btn-quit{background:var(--surface2);border:1px solid var(--border2)!important;color:var(--text-muted);}
+    .btn-quit:hover{color:var(--text);}
 
-    /* Glow orbs */
-    body::after {
-      content: '';
-      position: fixed;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(232,255,71,0.06) 0%, transparent 70%);
-      top: -200px; left: -200px;
-      pointer-events: none;
-      z-index: 0;
-      animation: orbFloat 8s ease-in-out infinite alternate;
-    }
-    @keyframes orbFloat {
-      from { transform: translate(0,0); }
-      to { transform: translate(100px, 80px); }
-    }
+    /* PRICING */
+    .pricing-header{text-align:center;margin-bottom:24px;padding-top:8px;}
+    .pricing-back{display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);font-size:13px;cursor:pointer;margin-bottom:16px;background:none;border:none;font-family:'DM Sans',sans-serif;transition:color .2s;}
+    .pricing-back:hover{color:var(--accent);}
+    .pricing-title{font-family:'Bebas Neue',cursive;font-size:34px;letter-spacing:3px;color:var(--accent);margin-bottom:4px;}
+    .pricing-sub{font-size:13px;color:var(--text-muted);}
+    .plans-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:20px;}
+    .plan-card{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:18px 14px;cursor:pointer;transition:border-color .2s,transform .2s;position:relative;}
+    .plan-card:hover{border-color:rgba(255,255,255,0.25);transform:translateY(-2px);}
+    .plan-card.selected{border:2px solid var(--correct);}
+    .plan-card.popular{border:2px solid var(--info);}
+    .plan-card.popular.selected{border:2px solid var(--correct);}
+    .popular-badge{font-size:10px;font-weight:600;background:var(--info-bg);color:var(--info);border:1px solid var(--info-border);padding:2px 9px;border-radius:999px;display:inline-block;margin-bottom:9px;}
+    .plan-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+    .plan-price{font-size:18px;font-weight:600;color:var(--accent);line-height:1.1;margin-bottom:2px;}
+    .plan-price small{font-size:10px;font-weight:400;color:var(--text-muted);}
+    .plan-desc{font-size:11px;color:var(--text-muted);margin:7px 0 10px;line-height:1.5;}
+    .plan-features{display:flex;flex-direction:column;gap:4px;}
+    .pf{font-size:11px;color:var(--text-muted);display:flex;align-items:flex-start;gap:6px;line-height:1.4;}
+    .pf-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+    .pf-dot.on{background:var(--correct);}
+    .pf-dot.off{background:var(--border2);}
+    .sel-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--correct-bg);border:1px solid var(--correct-border);display:none;align-items:center;justify-content:center;font-size:8px;color:var(--correct);}
+    .plan-card.selected .sel-check{display:flex;}
+    .checkout-box{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:22px;}
+    .checkout-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;}
+    .form-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:13px;}
+    .form-row{margin-bottom:13px;}
+    .form-label{font-size:10px;color:var(--text-muted);margin-bottom:5px;display:block;letter-spacing:.5px;text-transform:uppercase;}
+    .form-input{width:100%;height:40px;border-radius:9px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);padding:0 12px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+    .form-input:focus{border-color:var(--accent);}
+    .phone-wrap{display:flex;gap:8px;}
+    .phone-prefix{height:40px;min-width:64px;border-radius:9px;border:1px solid var(--border2);background:var(--surface2);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+    .order-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:13px;}
+    .order-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+    .order-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:9px;font-weight:600;font-size:14px;}
+    .order-label{color:var(--text-muted);}
+    .order-val{color:var(--text);}
+    .btn-pay{width:100%;height:50px;border-radius:11px;border:1px solid var(--correct-border);background:var(--correct-bg);color:var(--correct);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;}
+    .btn-pay:hover{background:rgba(74,222,128,0.18);}
+    .btn-pay:disabled{opacity:.5;cursor:not-allowed;}
+    .mpesa-badge{font-size:10px;font-weight:700;letter-spacing:1px;background:var(--correct);color:#0a0a0f;padding:2px 7px;border-radius:4px;}
+    .pay-status{margin-top:13px;border-radius:9px;padding:11px 13px;font-size:13px;display:none;align-items:flex-start;gap:9px;line-height:1.5;}
+    .pay-status.show{display:flex;}
+    .pay-status.pending{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;}
+    .pay-status.success{background:var(--correct-bg);border:1px solid var(--correct-border);color:var(--correct);}
+    .pay-status.error{background:var(--wrong-bg);border:1px solid var(--wrong-border);color:var(--wrong);}
+    .spinner{width:15px;height:15px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;margin-top:2px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .secure-note{font-size:11px;color:var(--text-muted);text-align:center;margin-top:11px;}
 
-    /* ===================== LAYOUT WRAPPER ===================== */
-    .screen {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 1;
-      width: 90vw;
-      max-width: 560px;
-    }
-    .screen.active {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translate(-50%, -50%) scale(1);
-    }
+    /* STREAK & MODAL */
+    .streak-popup{position:fixed;top:24px;right:24px;background:var(--surface);border:1px solid rgba(232,255,71,0.3);border-radius:12px;padding:10px 18px;font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:2px;color:var(--accent);z-index:100;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;}
+    .streak-popup.show{opacity:1;transform:translateY(0);}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px);}
+    .modal-overlay.show{opacity:1;pointer-events:auto;}
+    .modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px;width:340px;text-align:center;transform:scale(0.9);transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);}
+    .modal-overlay.show .modal-box{transform:scale(1);}
+    .modal-title{font-size:18px;font-weight:600;margin-bottom:8px;}
+    .modal-sub{font-size:14px;color:var(--text-muted);margin-bottom:24px;}
+    .modal-actions{display:flex;gap:10px;}
+    .modal-btn{flex:1;height:44px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;transition:all .2s;}
+    .modal-confirm{background:var(--wrong-bg);border:1px solid var(--wrong-border)!important;color:var(--wrong);}
+    .modal-cancel{background:var(--surface2);border:1px solid var(--border2)!important;color:var(--text);}
 
-    /* ===================== START SCREEN ===================== */
-    #start-screen {
-      text-align: center;
-    }
-    .logo-mark {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .logo-icon {
-      width: 48px; height: 48px;
-      background: var(--accent);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; color: #0a0a0f;
-    }
-    .logo-text {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 42px;
-      letter-spacing: 3px;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .start-tagline {
-      font-size: 15px;
-      color: var(--text-muted);
-      margin-bottom: 40px;
-      letter-spacing: 0.5px;
-    }
-    .start-card {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 20px;
-      padding: 32px;
-      margin-bottom: 24px;
-    }
-    .rules-title {
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-    }
-    .rule-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      color: #c8c8d8;
-      line-height: 1.5;
-    }
-    .rule-item:last-child { border-bottom: none; }
-    .rule-num {
-      width: 24px; height: 24px;
-      border-radius: 6px;
-      background: var(--accent-dim);
-      border: 1px solid rgba(232,255,71,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-    .btn-start {
-      width: 100%;
-      height: 56px;
-      background: var(--accent);
-      color: #0a0a0f;
-      border: none;
-      border-radius: 14px;
-      font-family: 'Bebas Neue', cursive;
-      font-size: 22px;
-      letter-spacing: 3px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
-    .btn-start:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px var(--accent-glow);
-    }
-    .btn-start:active { transform: scale(0.98); }
-
-    /* ===================== QUIZ BOX ===================== */
-    #quiz-screen {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 24px;
-      overflow: hidden;
-    }
-
-    .quiz-header {
-      padding: 20px 24px 0;
-    }
-    .quiz-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    .q-counter {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-      letter-spacing: 1px;
-    }
-    .q-counter span {
-      color: var(--accent);
-      font-weight: 600;
-    }
-    .timer-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 100px;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-    .timer-pill.danger {
-      background: rgba(255,107,53,0.12);
-      border-color: rgba(255,107,53,0.3);
-      color: var(--danger);
-      animation: timerPulse 0.5s ease-in-out infinite alternate;
-    }
-    @keyframes timerPulse {
-      from { box-shadow: none; }
-      to { box-shadow: 0 0 12px rgba(255,107,53,0.3); }
-    }
-    .timer-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: blink 1s step-end infinite;
-    }
-    .timer-pill.danger .timer-dot { background: var(--danger); }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    /* Progress bar */
-    .progress-track {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width 0.4s ease;
-      box-shadow: 0 0 8px var(--accent-glow);
-    }
-
-    /* Timer line (repurposed as a visual bar) */
-    .timer-track {
-      margin-top: 14px;
-      height: 2px;
-      background: var(--border);
-      border-radius: 1px;
-      overflow: hidden;
-    }
-    .timer-fill {
-      height: 100%;
-      width: 100%;
-      background: var(--accent);
-      border-radius: 1px;
-      transform-origin: left;
-      transition: background 0.3s;
-    }
-    .timer-fill.danger { background: var(--danger); }
-
-    /* Question */
-    .question-body {
-      padding: 24px 24px 16px;
-    }
-    .question-text {
-      font-size: 19px;
-      font-weight: 500;
-      line-height: 1.5;
-      color: var(--text);
-      min-height: 60px;
-    }
-
-    /* Options */
-    .options-list {
-      padding: 0 24px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .option {
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 12px;
-      padding: 14px 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 15px;
-    }
-    .option:hover:not(.disabled) {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-      transform: translateX(4px);
-    }
-    .option:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-    .option.correct {
-      background: var(--correct-bg);
-      border-color: var(--correct-border);
-      color: var(--correct);
-    }
-    .option.incorrect {
-      background: var(--wrong-bg);
-      border-color: var(--wrong-border);
-      color: var(--wrong);
-    }
-    .option.disabled { pointer-events: none; }
-    .option-label {
-      width: 26px; height: 26px;
-      border-radius: 7px;
-      background: var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      flex-shrink: 0;
-      transition: all 0.2s;
-    }
-    .option:hover:not(.disabled) .option-label {
-      background: var(--accent);
-      color: #0a0a0f;
-    }
-    .option.correct .option-label { background: var(--correct); color: #0a0a0f; }
-    .option.incorrect .option-label { background: var(--wrong); color: #0a0a0f; }
-    .option-icon { font-size: 14px; }
-
-    /* Footer */
-    .quiz-footer {
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--border);
-    }
-    .score-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .score-badge strong {
-      color: var(--accent);
-      font-size: 18px;
-      font-family: 'Bebas Neue', cursive;
-      letter-spacing: 1px;
-    }
-    .btn-next {
-      height: 44px;
-      padding: 0 22px;
-      background: var(--accent);
-      color: #0a0a0f;
-      border: none;
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex; align-items: center; gap: 8px;
-      opacity: 0;
-      pointer-events: none;
-      transform: scale(0.9);
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .btn-next.show {
-      opacity: 1;
-      pointer-events: auto;
-      transform: scale(1);
-    }
-    .btn-next:hover { box-shadow: 0 4px 20px var(--accent-glow); }
-
-    /* ===================== RESULT BOX ===================== */
-    #result-screen {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 24px;
-      padding: 40px 32px;
-      text-align: center;
-    }
-    .result-trophy {
-      font-size: 64px;
-      margin-bottom: 16px;
-      animation: trophyDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-    @keyframes trophyDrop {
-      from { transform: translateY(-30px) scale(0.5); opacity: 0; }
-      to { transform: translateY(0) scale(1); opacity: 1; }
-    }
-    .result-title {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 38px;
-      letter-spacing: 4px;
-      color: var(--accent);
-      margin-bottom: 6px;
-    }
-    .result-sub {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-    }
-
-    /* Score ring */
-    .score-ring-wrap {
-      position: relative;
-      width: 140px; height: 140px;
-      margin: 0 auto 28px;
-    }
-    .score-ring-wrap svg { transform: rotate(-90deg); }
-    .score-ring-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
-    .score-ring-fill {
-      fill: none;
-      stroke: var(--accent);
-      stroke-width: 8;
-      stroke-linecap: round;
-      stroke-dasharray: 0 339.3;
-      transition: stroke-dasharray 1s ease;
-    }
-    .score-ring-fill.good { stroke: var(--correct); }
-    .score-ring-fill.bad { stroke: var(--wrong); }
-    .score-ring-text {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      text-align: center;
-    }
-    .score-num {
-      font-family: 'Bebas Neue', cursive;
-      font-size: 44px;
-      letter-spacing: 2px;
-      color: var(--text);
-      line-height: 1;
-    }
-    .score-denom {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    /* Answer review */
-    .review-label {
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      text-align: left;
-    }
-    .review-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 220px;
-      overflow-y: auto;
-      margin-bottom: 28px;
-      padding-right: 4px;
-    }
-    .review-list::-webkit-scrollbar { width: 4px; }
-    .review-list::-webkit-scrollbar-track { background: transparent; }
-    .review-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-    .review-item {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      text-align: left;
-    }
-    .review-icon {
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .review-icon.c { background: var(--correct-bg); color: var(--correct); border: 1px solid var(--correct-border); }
-    .review-icon.w { background: var(--wrong-bg); color: var(--wrong); border: 1px solid var(--wrong-border); }
-    .review-q { font-size: 13px; color: #c8c8d8; line-height: 1.4; }
-    .review-ans { font-size: 12px; margin-top: 3px; }
-    .review-ans.correct { color: var(--correct); }
-    .review-ans.wrong { color: var(--wrong); }
-
-    .result-actions {
-      display: flex;
-      gap: 10px;
-    }
-    .btn-restart, .btn-quit {
-      flex: 1;
-      height: 50px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .btn-restart {
-      background: var(--accent);
-      color: #0a0a0f;
-    }
-    .btn-restart:hover { box-shadow: 0 4px 24px var(--accent-glow); transform: translateY(-1px); }
-    .btn-quit {
-      background: var(--surface2);
-      border: 1px solid var(--border2) !important;
-      color: var(--text-muted);
-    }
-    .btn-quit:hover { color: var(--text); border-color: var(--border2); }
-
-    /* ===================== STREAK ===================== */
-    .streak-popup {
-      position: fixed;
-      top: 24px; right: 24px;
-      background: var(--surface);
-      border: 1px solid rgba(232,255,71,0.3);
-      border-radius: 12px;
-      padding: 10px 18px;
-      font-family: 'Bebas Neue', cursive;
-      font-size: 20px;
-      letter-spacing: 2px;
-      color: var(--accent);
-      z-index: 100;
-      opacity: 0;
-      transform: translateY(-10px);
-      transition: all 0.3s;
-      pointer-events: none;
-    }
-    .streak-popup.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ===================== CONFIRM MODAL ===================== */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-      backdrop-filter: blur(4px);
-    }
-    .modal-overlay.show { opacity: 1; pointer-events: auto; }
-    .modal-box {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 20px;
-      padding: 32px;
-      width: 340px;
-      text-align: center;
-      transform: scale(0.9);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .modal-overlay.show .modal-box { transform: scale(1); }
-    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-    .modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
-    .modal-actions { display: flex; gap: 10px; }
-    .modal-btn {
-      flex: 1; height: 44px; border-radius: 10px; border: none;
-      cursor: pointer; font-family: 'DM Sans', sans-serif;
-      font-size: 14px; font-weight: 600; transition: all 0.2s;
-    }
-    .modal-confirm { background: var(--wrong-bg); border: 1px solid var(--wrong-border) !important; color: var(--wrong); }
-    .modal-cancel { background: var(--surface2); border: 1px solid var(--border2) !important; color: var(--text); }
-
-    /* ===================== RESPONSIVE ===================== */
-    @media (max-width: 480px) {
-      .question-text { font-size: 16px; }
-      .option { font-size: 14px; padding: 12px 14px; }
+    @media(max-width:540px){
+      .plans-grid{grid-template-columns:1fr;}
+      .form-2col{grid-template-columns:1fr;}
+      .question-text{font-size:16px;}
+      .option{font-size:14px;padding:12px 14px;}
     }
   </style>
 </head>
 <body>
 
-  <!-- Streak popup -->
-  <div class="streak-popup" id="streak-popup">🔥 <span id="streak-num">2</span> STREAK!</div>
+<div class="streak-popup" id="streak-popup">🔥 <span id="streak-num">2</span> STREAK!</div>
 
-  <!-- Exit confirm modal -->
-  <div class="modal-overlay" id="exit-modal">
-    <div class="modal-box">
-      <div class="modal-title">Quit the quiz?</div>
-      <div class="modal-sub">Your progress will be lost. Are you sure?</div>
-      <div class="modal-actions">
-        <button class="modal-btn modal-confirm" id="modal-confirm">Yes, quit</button>
-        <button class="modal-btn modal-cancel" id="modal-cancel">Keep playing</button>
+<div class="modal-overlay" id="exit-modal">
+  <div class="modal-box">
+    <div class="modal-title">Quit the quiz?</div>
+    <div class="modal-sub">Your progress will be lost. Are you sure?</div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-confirm" id="modal-confirm">Yes, quit</button>
+      <button class="modal-btn modal-cancel" id="modal-cancel">Keep playing</button>
+    </div>
+  </div>
+</div>
+
+<!-- START -->
+<div class="screen active" id="start-screen">
+  <div class="logo-mark">
+    <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+    <div class="logo-text">Quiz Arena</div>
+  </div>
+  <p class="start-tagline">Test your web dev knowledge. Beat the clock.</p>
+  <div class="start-card">
+    <div class="rules-title">How it works</div>
+    <div class="rule-item"><div class="rule-num">1</div><div>You have <strong>15 seconds</strong> per question.</div></div>
+    <div class="rule-item"><div class="rule-num">2</div><div>Once you pick an answer, it's locked in.</div></div>
+    <div class="rule-item"><div class="rule-num">3</div><div>Time runs out — the correct answer is revealed.</div></div>
+    <div class="rule-item"><div class="rule-num">4</div><div>Chain correct answers for a <strong>streak bonus</strong>.</div></div>
+    <div class="rule-item"><div class="rule-num">5</div><div>Review every answer at the end.</div></div>
+  </div>
+  <button class="btn-start" id="btn-start"><i class="fas fa-play"></i> START QUIZ</button>
+  <button class="btn-pricing" id="btn-show-pricing"><i class="fas fa-crown" style="color:var(--accent);font-size:13px;"></i>&nbsp; View plans &amp; pricing</button>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="quiz-screen">
+  <div class="quiz-header">
+    <div class="quiz-meta">
+      <div class="q-counter">QUESTION <span id="q-num">1</span> OF <span id="q-total">6</span></div>
+      <div class="timer-pill" id="timer-pill"><div class="timer-dot"></div><span id="timer-display">15</span>s</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="timer-track"><div class="timer-fill" id="timer-fill"></div></div>
+  </div>
+  <div class="question-body"><div class="question-text" id="question-text"></div></div>
+  <div class="options-list" id="options-list"></div>
+  <div class="quiz-footer">
+    <div class="score-badge"><i class="fas fa-star" style="color:var(--accent);font-size:12px;"></i>&nbsp;<strong id="live-score">0</strong> pts</div>
+    <button class="btn-next" id="btn-next">Next <i class="fas fa-arrow-right" style="font-size:12px;"></i></button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="result-screen">
+  <div class="result-trophy" id="result-trophy">🏆</div>
+  <div class="result-title" id="result-title">COMPLETE!</div>
+  <div class="result-sub" id="result-sub">Here's how you did</div>
+  <div class="score-ring-wrap">
+    <svg width="140" height="140" viewBox="0 0 120 120">
+      <circle class="score-ring-bg" cx="60" cy="60" r="54"/>
+      <circle class="score-ring-fill" id="score-ring" cx="60" cy="60" r="54"/>
+    </svg>
+    <div class="score-ring-text">
+      <div class="score-num" id="score-num">0</div>
+      <div class="score-denom" id="score-denom">/ 6</div>
+    </div>
+  </div>
+  <div class="review-label">Answer breakdown</div>
+  <div class="review-list" id="review-list"></div>
+  <div class="result-actions">
+    <button class="btn-restart" id="btn-restart"><i class="fas fa-redo" style="margin-right:8px;font-size:13px;"></i>Play again</button>
+    <button class="btn-quit" id="btn-quit">Exit</button>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="screen" id="pricing-screen">
+  <div class="pricing-header">
+    <button class="pricing-back" id="btn-back-pricing"><i class="fas fa-arrow-left" style="font-size:11px;"></i>&nbsp; Back</button>
+    <div class="pricing-title">Choose your plan</div>
+    <div class="pricing-sub">Pay securely via M-Pesa. Cancel anytime.</div>
+  </div>
+
+  <div class="plans-grid">
+    <div class="plan-card" data-plan="starter" data-price="0" onclick="selectPlan(this)">
+      <div class="sel-check"><i class="fas fa-check" style="font-size:8px;"></i></div>
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">Free</div>
+      <div class="plan-desc">Try it with no commitment</div>
+      <div class="plan-features">
+        <div class="pf"><div class="pf-dot on"></div>Up to 5 employees</div>
+        <div class="pf"><div class="pf-dot on"></div>3 quiz categories</div>
+        <div class="pf"><div class="pf-dot off"></div>No certificates</div>
+        <div class="pf"><div class="pf-dot off"></div>No custom branding</div>
+      </div>
+    </div>
+    <div class="plan-card popular selected" data-plan="business" data-price="150000" onclick="selectPlan(this)">
+      <div class="sel-check"><i class="fas fa-check" style="font-size:8px;"></i></div>
+      <div class="popular-badge">Most popular</div>
+      <div class="plan-name">Business</div>
+      <div class="plan-price">TZS 150,000 <small>/ mo</small></div>
+      <div class="plan-desc">For SMEs running staff training</div>
+      <div class="plan-features">
+        <div class="pf"><div class="pf-dot on"></div>Up to 100 employees</div>
+        <div class="pf"><div class="pf-dot on"></div>Unlimited categories</div>
+        <div class="pf"><div class="pf-dot on"></div>PDF certificates</div>
+        <div class="pf"><div class="pf-dot on"></div>Custom branding</div>
+      </div>
+    </div>
+    <div class="plan-card" data-plan="enterprise" data-price="500000" onclick="selectPlan(this)">
+      <div class="sel-check"><i class="fas fa-check" style="font-size:8px;"></i></div>
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price">TZS 500,000 <small>/ mo</small></div>
+      <div class="plan-desc">For banks, telcos &amp; large corps</div>
+      <div class="plan-features">
+        <div class="pf"><div class="pf-dot on"></div>Unlimited employees</div>
+        <div class="pf"><div class="pf-dot on"></div>AI question generation</div>
+        <div class="pf"><div class="pf-dot on"></div>HR system integration</div>
+        <div class="pf"><div class="pf-dot on"></div>Dedicated support</div>
       </div>
     </div>
   </div>
 
-  <!-- ========== START SCREEN ========== -->
-  <div class="screen active" id="start-screen">
-    <div class="logo-mark">
-      <div class="logo-icon"><i class="fas fa-bolt"></i></div>
-      <div class="logo-text">Quiz Arena</div>
+  <div class="checkout-box">
+    <div class="checkout-title">Payment details</div>
+    <div class="form-2col">
+      <div>
+        <label class="form-label">Full name</label>
+        <input class="form-input" id="inp-name" type="text" placeholder="James Mwangi" autocomplete="name"/>
+      </div>
+      <div>
+        <label class="form-label">Company</label>
+        <input class="form-input" id="inp-company" type="text" placeholder="Acme Tanzania Ltd"/>
+      </div>
     </div>
-    <p class="start-tagline">Test your web dev knowledge. Beat the clock.</p>
-
-    <div class="start-card">
-      <div class="rules-title">How it works</div>
-      <div class="rule-item"><div class="rule-num">1</div><div>You have <strong>15 seconds</strong> per question — spend them wisely.</div></div>
-      <div class="rule-item"><div class="rule-num">2</div><div>Once you pick an answer, it's locked in.</div></div>
-      <div class="rule-item"><div class="rule-num">3</div><div>If time runs out, the correct answer is revealed.</div></div>
-      <div class="rule-item"><div class="rule-num">4</div><div>Chain correct answers for a <strong>streak bonus</strong>.</div></div>
-      <div class="rule-item"><div class="rule-num">5</div><div>Review every answer at the end.</div></div>
+    <div class="form-row">
+      <label class="form-label">M-Pesa phone number</label>
+      <div class="phone-wrap">
+        <div class="phone-prefix">+255</div>
+        <input class="form-input" id="inp-phone" type="tel" placeholder="712 345 678" maxlength="9" style="flex:1"/>
+      </div>
     </div>
-
-    <button class="btn-start" id="btn-start">
-      <i class="fas fa-play"></i> START QUIZ
+    <div class="order-box">
+      <div class="order-row"><span class="order-label">Plan</span><span class="order-val" id="sum-plan">Business</span></div>
+      <div class="order-row"><span class="order-label">Billing</span><span class="order-val">Monthly</span></div>
+      <div class="order-row total"><span class="order-label">Total due today</span><span class="order-val" id="sum-total">TZS 150,000</span></div>
+    </div>
+    <button class="btn-pay" id="btn-pay" onclick="handlePay()">
+      <span class="mpesa-badge" id="pay-badge">M-PESA</span>
+      <span id="btn-pay-text">Pay TZS 150,000</span>
     </button>
+    <div class="pay-status" id="pay-status">
+      <div id="pay-icon" class="spinner"></div>
+      <div id="pay-msg"></div>
+    </div>
+    <div class="secure-note"><i class="fas fa-lock" style="font-size:10px;margin-right:4px;"></i>Secured by Safaricom Daraja &middot; Your PIN is never shared with us</div>
   </div>
-
-  <!-- ========== QUIZ SCREEN ========== -->
-  <div class="screen" id="quiz-screen">
-    <div class="quiz-header">
-      <div class="quiz-meta">
-        <div class="q-counter">QUESTION <span id="q-num">1</span> OF <span id="q-total">6</span></div>
-        <div class="timer-pill" id="timer-pill">
-          <div class="timer-dot"></div>
-          <span id="timer-display">15</span>s
-        </div>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-      </div>
-      <div class="timer-track">
-        <div class="timer-fill" id="timer-fill"></div>
-      </div>
-    </div>
-
-    <div class="question-body">
-      <div class="question-text" id="question-text"></div>
-    </div>
-
-    <div class="options-list" id="options-list"></div>
-
-    <div class="quiz-footer">
-      <div class="score-badge">
-        <i class="fas fa-star" style="color: var(--accent); font-size: 12px;"></i>
-        <strong id="live-score">0</strong> pts
-      </div>
-      <button class="btn-next" id="btn-next" aria-label="Next question">
-        Next <i class="fas fa-arrow-right" style="font-size:12px;"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- ========== RESULT SCREEN ========== -->
-  <div class="screen" id="result-screen">
-    <div class="result-trophy" id="result-trophy">🏆</div>
-    <div class="result-title" id="result-title">COMPLETE!</div>
-    <div class="result-sub" id="result-sub">Here's how you did</div>
-
-    <div class="score-ring-wrap">
-      <svg width="140" height="140" viewBox="0 0 120 120">
-        <circle class="score-ring-bg" cx="60" cy="60" r="54"/>
-        <circle class="score-ring-fill" id="score-ring" cx="60" cy="60" r="54"/>
-      </svg>
-      <div class="score-ring-text">
-        <div class="score-num" id="score-num">0</div>
-        <div class="score-denom" id="score-denom">/ 6</div>
-      </div>
-    </div>
-
-    <div class="review-label">Answer breakdown</div>
-    <div class="review-list" id="review-list"></div>
-
-    <div class="result-actions">
-      <button class="btn-restart" id="btn-restart"><i class="fas fa-redo" style="margin-right:8px;font-size:13px;"></i>Play again</button>
-      <button class="btn-quit" id="btn-quit">Exit</button>
-    </div>
-  </div>
+</div>
 
 <script>
-  // ===================== DATA =====================
-  const QUESTIONS = [
-    { question: "What does HTML stand for?", answer: "Hyper Text Markup Language", options: ["Hyper Text Preprocessor","Hyper Text Markup Language","Hyper Text Multiple Language","Hyper Tool Multi Language"] },
-    { question: "What does CSS stand for?", answer: "Cascading Style Sheet", options: ["Common Style Sheet","Colorful Style Sheet","Computer Style Sheet","Cascading Style Sheet"] },
-    { question: "What does PHP stand for?", answer: "Hypertext Preprocessor", options: ["Hypertext Preprocessor","Hypertext Programming","Hypertext Preprogramming","Hometext Preprocessor"] },
-    { question: "What does SQL stand for?", answer: "Structured Query Language", options: ["Stylish Question Language","Stylesheet Query Language","Statement Question Language","Structured Query Language"] },
-    { question: "What does XML stand for?", answer: "eXtensible Markup Language", options: ["eXtensible Markup Language","eXecutable Multiple Language","eXTra Multi-Program Language","eXamine Multiple Language"] },
-    { question: "What is React?", answer: "A Javascript library", options: ["A Javascript framework","A Javascript library","A frontend framework","A reactive framework for building web pages"] },
-  ];
-  const LABELS = ['A','B','C','D'];
-  const CONFIG = { timePerQuestion: 15 };
+const BACKEND_URL = 'http://localhost:3000';
+const CONFIG = { timePerQuestion: 15 };
+const LABELS = ['A','B','C','D'];
+const QUESTIONS = [
+  {question:"What does HTML stand for?",answer:"Hyper Text Markup Language",options:["Hyper Text Preprocessor","Hyper Text Markup Language","Hyper Text Multiple Language","Hyper Tool Multi Language"]},
+  {question:"What does CSS stand for?",answer:"Cascading Style Sheet",options:["Common Style Sheet","Colorful Style Sheet","Computer Style Sheet","Cascading Style Sheet"]},
+  {question:"What does PHP stand for?",answer:"Hypertext Preprocessor",options:["Hypertext Preprocessor","Hypertext Programming","Hypertext Preprogramming","Hometext Preprocessor"]},
+  {question:"What does SQL stand for?",answer:"Structured Query Language",options:["Stylish Question Language","Stylesheet Query Language","Statement Question Language","Structured Query Language"]},
+  {question:"What does XML stand for?",answer:"eXtensible Markup Language",options:["eXtensible Markup Language","eXecutable Multiple Language","eXTra Multi-Program Language","eXamine Multiple Language"]},
+  {question:"What is React?",answer:"A Javascript library",options:["A Javascript framework","A Javascript library","A frontend framework","A reactive framework for building web pages"]},
+];
 
-  // ===================== STATE =====================
-  const state = {
-    qIndex: 0,
-    score: 0,
-    streak: 0,
-    timeLeft: CONFIG.timePerQuestion,
-    timer: null,
-    timerLine: null,
-    answered: false,
-    results: [],
-    shuffledOptions: [],
-  };
+const state={qIndex:0,score:0,streak:0,timeLeft:CONFIG.timePerQuestion,timer:null,answered:false,results:[],shuffledOptions:[]};
+let selectedPlan={plan:'business',price:150000};
+let pollTimer=null;
 
-  // ===================== DOM =====================
-  const $ = id => document.getElementById(id);
-  const screens = {
-    start: $('start-screen'),
-    quiz: $('quiz-screen'),
-    result: $('result-screen'),
-  };
+const $=id=>document.getElementById(id);
+const screens={start:$('start-screen'),quiz:$('quiz-screen'),result:$('result-screen'),pricing:$('pricing-screen')};
+function showScreen(n){Object.entries(screens).forEach(([k,el])=>el.classList.toggle('active',k===n));}
+function shuffle(a){return[...a].sort(()=>Math.random()-.5);}
 
-  function showScreen(name) {
-    Object.entries(screens).forEach(([k, el]) => el.classList.toggle('active', k === name));
-  }
+function startQuiz(){
+  Object.assign(state,{qIndex:0,score:0,streak:0,answered:false,results:[]});
+  $('q-total').textContent=QUESTIONS.length;
+  $('score-denom').textContent='/ '+QUESTIONS.length;
+  loadQuestion();showScreen('quiz');
+}
 
-  // ===================== QUIZ LOGIC =====================
-  function shuffleArray(arr) {
-    return [...arr].sort(() => Math.random() - 0.5);
-  }
-
-  function startQuiz() {
-    Object.assign(state, { qIndex:0, score:0, streak:0, answered:false, results:[] });
-    $('q-total').textContent = QUESTIONS.length;
-    $('score-denom').textContent = '/ ' + QUESTIONS.length;
-    loadQuestion();
-    showScreen('quiz');
-  }
-
-  function loadQuestion() {
-    state.answered = false;
-    const q = QUESTIONS[state.qIndex];
-    state.shuffledOptions = shuffleArray(q.options);
-
-    $('q-num').textContent = state.qIndex + 1;
-    $('question-text').textContent = q.question;
-    $('live-score').textContent = state.score;
-    $('btn-next').classList.remove('show');
-
-    // Progress bar
-    const pct = (state.qIndex / QUESTIONS.length) * 100;
-    $('progress-fill').style.width = pct + '%';
-
-    // Render options
-    const list = $('options-list');
-    list.innerHTML = '';
-    state.shuffledOptions.forEach((opt, i) => {
-      const div = document.createElement('div');
-      div.className = 'option';
-      div.tabIndex = 0;
-      div.setAttribute('role', 'button');
-      div.setAttribute('aria-label', `Option ${LABELS[i]}: ${opt}`);
-      div.innerHTML = `
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="option-label">${LABELS[i]}</div>
-          <span>${opt}</span>
-        </div>
-        <span class="option-icon"></span>
-      `;
-      div.addEventListener('click', () => selectOption(div, opt));
-      div.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') selectOption(div, opt); });
-      list.appendChild(div);
-    });
-
-    resetTimer();
-  }
-
-  function selectOption(el, chosen) {
-    if (state.answered) return;
-    state.answered = true;
-    clearInterval(state.timer);
-    clearInterval(state.timerLine);
-
-    const correct = QUESTIONS[state.qIndex].answer;
-    const isCorrect = chosen === correct;
-
-    // Record result
-    state.results.push({ question: QUESTIONS[state.qIndex].question, chosen, correct, isCorrect });
-
-    if (isCorrect) {
-      state.score++;
-      state.streak++;
-      el.classList.add('correct');
-      el.querySelector('.option-icon').innerHTML = '<i class="fas fa-check"></i>';
-      if (state.streak >= 2) showStreak(state.streak);
-    } else {
-      state.streak = 0;
-      el.classList.add('incorrect');
-      el.querySelector('.option-icon').innerHTML = '<i class="fas fa-times"></i>';
-      // Reveal correct
-      document.querySelectorAll('.option').forEach(opt => {
-        const txt = opt.querySelector('span:last-of-type') || opt.querySelectorAll('span')[1];
-        if (opt.querySelector('span + span') && getOptionText(opt) === correct) {
-          opt.classList.add('correct');
-          opt.querySelector('.option-icon').innerHTML = '<i class="fas fa-check"></i>';
-        }
-      });
-    }
-
-    // Disable all
-    document.querySelectorAll('.option').forEach(o => o.classList.add('disabled'));
-    $('live-score').textContent = state.score;
-    $('btn-next').classList.add('show');
-  }
-
-  function getOptionText(el) {
-    const spans = el.querySelectorAll('span');
-    return spans[spans.length - 1].textContent;
-  }
-
-  function nextQuestion() {
-    if (state.qIndex < QUESTIONS.length - 1) {
-      state.qIndex++;
-      loadQuestion();
-    } else {
-      showResult();
-    }
-  }
-
-  // ===================== TIMER =====================
-  function resetTimer() {
-    clearInterval(state.timer);
-    clearInterval(state.timerLine);
-    state.timeLeft = CONFIG.timePerQuestion;
-
-    const fill = $('timer-fill');
-    const pill = $('timer-pill');
-    fill.style.width = '100%';
-    fill.classList.remove('danger');
-    pill.classList.remove('danger');
-    $('timer-display').textContent = state.timeLeft;
-
-    // Smooth CSS timer line
-    fill.style.transition = 'none';
-    fill.style.width = '100%';
-    requestAnimationFrame(() => {
-      fill.style.transition = `width ${CONFIG.timePerQuestion}s linear`;
-      fill.style.width = '0%';
-    });
-
-    state.timer = setInterval(() => {
-      state.timeLeft--;
-      $('timer-display').textContent = state.timeLeft;
-
-      if (state.timeLeft <= 5) {
-        fill.classList.add('danger');
-        pill.classList.add('danger');
-      }
-
-      if (state.timeLeft <= 0) {
-        clearInterval(state.timer);
-        if (!state.answered) {
-          state.answered = true;
-          state.streak = 0;
-          // Reveal correct without penalizing
-          const correct = QUESTIONS[state.qIndex].answer;
-          state.results.push({ question: QUESTIONS[state.qIndex].question, chosen: null, correct, isCorrect: false });
-          document.querySelectorAll('.option').forEach(opt => {
-            opt.classList.add('disabled');
-            if (getOptionText(opt) === correct) {
-              opt.classList.add('correct');
-              opt.querySelector('.option-icon').innerHTML = '<i class="fas fa-check"></i>';
-            }
-          });
-          $('btn-next').classList.add('show');
-          $('timer-display').textContent = '00';
-        }
-      }
-    }, 1000);
-  }
-
-  // ===================== STREAK POPUP =====================
-  let streakTimeout;
-  function showStreak(n) {
-    clearTimeout(streakTimeout);
-    const popup = $('streak-popup');
-    $('streak-num').textContent = n;
-    popup.classList.add('show');
-    streakTimeout = setTimeout(() => popup.classList.remove('show'), 2000);
-  }
-
-  // ===================== RESULT =====================
-  function showResult() {
-    clearInterval(state.timer);
-    clearInterval(state.timerLine);
-
-    const total = QUESTIONS.length;
-    const pct = state.score / total;
-
-    // Trophy & title
-    if (pct === 1) {
-      $('result-trophy').textContent = '🏆';
-      $('result-title').textContent = 'PERFECT!';
-      $('result-sub').textContent = 'You got every question right!';
-    } else if (pct >= 0.6) {
-      $('result-trophy').textContent = '⚡';
-      $('result-title').textContent = 'WELL DONE!';
-      $('result-sub').textContent = 'Solid performance!';
-    } else {
-      $('result-trophy').textContent = '💡';
-      $('result-title').textContent = 'KEEP LEARNING';
-      $('result-sub').textContent = 'Review the answers below and try again.';
-    }
-
-    $('score-num').textContent = state.score;
-
-    // Animate score ring
-    const circumference = 2 * Math.PI * 54;
-    const filled = circumference * pct;
-    const ring = $('score-ring');
-    ring.style.strokeDasharray = `0 ${circumference}`;
-    ring.className = 'score-ring-fill' + (pct >= 0.6 ? ' good' : ' bad');
-    setTimeout(() => {
-      ring.style.strokeDasharray = `${filled} ${circumference}`;
-    }, 300);
-
-    // Review list
-    const list = $('review-list');
-    list.innerHTML = '';
-    state.results.forEach(r => {
-      const div = document.createElement('div');
-      div.className = 'review-item';
-      div.innerHTML = `
-        <div class="review-icon ${r.isCorrect ? 'c' : 'w'}">
-          <i class="fas fa-${r.isCorrect ? 'check' : 'times'}"></i>
-        </div>
-        <div>
-          <div class="review-q">${r.question}</div>
-          <div class="review-ans ${r.isCorrect ? 'correct' : 'wrong'}">
-            ${r.isCorrect ? '✓ ' + r.correct : (r.chosen ? '✗ You chose: ' + r.chosen + ' · ' : '⏱ Time out · ') + 'Correct: ' + r.correct}
-          </div>
-        </div>
-      `;
-      list.appendChild(div);
-    });
-
-    showScreen('result');
-    $('progress-fill').style.width = '100%';
-  }
-
-  // ===================== EXIT CONFIRM =====================
-  function promptExit() {
-    $('exit-modal').classList.add('show');
-  }
-  $('modal-confirm').addEventListener('click', () => {
-    $('exit-modal').classList.remove('show');
-    clearInterval(state.timer);
-    clearInterval(state.timerLine);
-    showScreen('start');
+function loadQuestion(){
+  state.answered=false;
+  const q=QUESTIONS[state.qIndex];
+  state.shuffledOptions=shuffle(q.options);
+  $('q-num').textContent=state.qIndex+1;
+  $('question-text').textContent=q.question;
+  $('live-score').textContent=state.score;
+  $('btn-next').classList.remove('show');
+  $('progress-fill').style.width=(state.qIndex/QUESTIONS.length*100)+'%';
+  const list=$('options-list');list.innerHTML='';
+  state.shuffledOptions.forEach((opt,i)=>{
+    const div=document.createElement('div');
+    div.className='option';div.tabIndex=0;div.setAttribute('role','button');
+    div.innerHTML=`<div style="display:flex;align-items:center;gap:12px;"><div class="option-label">${LABELS[i]}</div><span>${opt}</span></div><span class="option-icon"></span>`;
+    div.addEventListener('click',()=>selectOption(div,opt));
+    div.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')selectOption(div,opt);});
+    list.appendChild(div);
   });
-  $('modal-cancel').addEventListener('click', () => {
-    $('exit-modal').classList.remove('show');
-  });
+  resetTimer();
+}
 
-  // ===================== EVENT LISTENERS =====================
-  $('btn-start').addEventListener('click', startQuiz);
-  $('btn-next').addEventListener('click', nextQuestion);
-  $('btn-restart').addEventListener('click', startQuiz);
-  $('btn-quit').addEventListener('click', () => showScreen('start'));
+function getOptText(el){const s=el.querySelectorAll('span');return s[s.length-1].textContent;}
 
-  // Keyboard: Escape to exit, 1-4 to pick option
-  document.addEventListener('keydown', e => {
-    if (screens.quiz.classList.contains('active')) {
-      if (e.key === 'Escape') promptExit();
-      const optionKeys = ['1','2','3','4'];
-      const idx = optionKeys.indexOf(e.key);
-      if (idx !== -1 && !state.answered) {
-        const opts = document.querySelectorAll('.option');
-        if (opts[idx]) opts[idx].click();
-      }
-      if ((e.key === 'Enter' || e.key === ' ') && $('btn-next').classList.contains('show')) {
-        e.preventDefault();
-        nextQuestion();
+function selectOption(el,chosen){
+  if(state.answered)return;
+  state.answered=true;clearInterval(state.timer);
+  const correct=QUESTIONS[state.qIndex].answer;
+  const ok=chosen===correct;
+  state.results.push({question:QUESTIONS[state.qIndex].question,chosen,correct,isCorrect:ok});
+  if(ok){
+    state.score++;state.streak++;
+    el.classList.add('correct');el.querySelector('.option-icon').innerHTML='<i class="fas fa-check"></i>';
+    if(state.streak>=2)showStreak(state.streak);
+  }else{
+    state.streak=0;el.classList.add('incorrect');el.querySelector('.option-icon').innerHTML='<i class="fas fa-times"></i>';
+    document.querySelectorAll('.option').forEach(o=>{if(getOptText(o)===correct){o.classList.add('correct');o.querySelector('.option-icon').innerHTML='<i class="fas fa-check"></i>';}});
+  }
+  document.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+  $('live-score').textContent=state.score;$('btn-next').classList.add('show');
+}
+
+function nextQuestion(){if(state.qIndex<QUESTIONS.length-1){state.qIndex++;loadQuestion();}else showResult();}
+
+function resetTimer(){
+  clearInterval(state.timer);state.timeLeft=CONFIG.timePerQuestion;
+  const fill=$('timer-fill'),pill=$('timer-pill');
+  fill.classList.remove('danger');pill.classList.remove('danger');
+  $('timer-display').textContent=state.timeLeft;
+  fill.style.transition='none';fill.style.width='100%';
+  requestAnimationFrame(()=>{fill.style.transition=`width ${CONFIG.timePerQuestion}s linear`;fill.style.width='0%';});
+  state.timer=setInterval(()=>{
+    state.timeLeft--;$('timer-display').textContent=state.timeLeft;
+    if(state.timeLeft<=5){fill.classList.add('danger');pill.classList.add('danger');}
+    if(state.timeLeft<=0){
+      clearInterval(state.timer);
+      if(!state.answered){
+        state.answered=true;state.streak=0;
+        const correct=QUESTIONS[state.qIndex].answer;
+        state.results.push({question:QUESTIONS[state.qIndex].question,chosen:null,correct,isCorrect:false});
+        document.querySelectorAll('.option').forEach(o=>{o.classList.add('disabled');if(getOptText(o)===correct){o.classList.add('correct');o.querySelector('.option-icon').innerHTML='<i class="fas fa-check"></i>';}});
+        $('btn-next').classList.add('show');$('timer-display').textContent='00';
       }
     }
+  },1000);
+}
+
+let streakTimeout;
+function showStreak(n){
+  clearTimeout(streakTimeout);$('streak-num').textContent=n;$('streak-popup').classList.add('show');
+  streakTimeout=setTimeout(()=>$('streak-popup').classList.remove('show'),2000);
+}
+
+function showResult(){
+  clearInterval(state.timer);
+  const pct=state.score/QUESTIONS.length;
+  if(pct===1){$('result-trophy').textContent='🏆';$('result-title').textContent='PERFECT!';$('result-sub').textContent='You got every question right!';}
+  else if(pct>=.6){$('result-trophy').textContent='⚡';$('result-title').textContent='WELL DONE!';$('result-sub').textContent='Solid performance!';}
+  else{$('result-trophy').textContent='💡';$('result-title').textContent='KEEP LEARNING';$('result-sub').textContent='Review the answers below and try again.';}
+  $('score-num').textContent=state.score;
+  const circ=2*Math.PI*54,ring=$('score-ring');
+  ring.style.strokeDasharray=`0 ${circ}`;ring.className='score-ring-fill'+(pct>=.6?' good':' bad');
+  setTimeout(()=>{ring.style.strokeDasharray=`${circ*pct} ${circ}`;},300);
+  const list=$('review-list');list.innerHTML='';
+  state.results.forEach(r=>{
+    const div=document.createElement('div');div.className='review-item';
+    div.innerHTML=`<div class="review-icon ${r.isCorrect?'c':'w'}"><i class="fas fa-${r.isCorrect?'check':'times'}"></i></div><div><div class="review-q">${r.question}</div><div class="review-ans ${r.isCorrect?'correct':'wrong'}">${r.isCorrect?'✓ '+r.correct:(r.chosen?'✗ You chose: '+r.chosen+' · ':'⏱ Time out · ')+'Correct: '+r.correct}</div></div>`;
+    list.appendChild(div);
   });
+  showScreen('result');$('progress-fill').style.width='100%';
+}
+
+function selectPlan(card){
+  document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedPlan={plan:card.dataset.plan,price:parseInt(card.dataset.price)};
+  const nm=card.dataset.plan.charAt(0).toUpperCase()+card.dataset.plan.slice(1);
+  $('sum-plan').textContent=nm;
+  const free=selectedPlan.price===0;
+  $('sum-total').textContent=free?'Free':'TZS '+selectedPlan.price.toLocaleString();
+  $('btn-pay-text').textContent=free?'Activate free plan':'Pay TZS '+selectedPlan.price.toLocaleString();
+  $('pay-badge').style.display=free?'none':'';
+  clearPayStatus();
+}
+
+function setPayStatus(type,msg,spin){
+  const box=$('pay-status'),icon=$('pay-icon');
+  box.className='pay-status show '+type;icon.className=spin?'spinner':'';
+  if(!spin)icon.innerHTML=type==='success'?'<i class="fas fa-check-circle" style="font-size:15px;margin-top:1px;"></i>':'<i class="fas fa-exclamation-circle" style="font-size:15px;margin-top:1px;"></i>';
+  $('pay-msg').textContent=msg;
+}
+function clearPayStatus(){$('pay-status').className='pay-status';}
+
+async function handlePay(){
+  const name=$('inp-name').value.trim(),company=$('inp-company').value.trim(),phone=$('inp-phone').value.replace(/\s/g,'');
+  if(!name){setPayStatus('error','Please enter your full name.',false);return;}
+  if(!phone||phone.length<9){setPayStatus('error','Enter a valid 9-digit number e.g. 712345678.',false);return;}
+  if(!/^[67]\d{8}$/.test(phone)){setPayStatus('error','Number must start with 6 or 7 e.g. 712345678.',false);return;}
+  if(selectedPlan.price===0){setPayStatus('success','Free plan activated! Start exploring Quiz Arena.',false);return;}
+  $('btn-pay').disabled=true;
+  setPayStatus('pending','Sending M-Pesa request to +255'+phone+'...',true);
+  try{
+    const res=await fetch(`${BACKEND_URL}/api/mpesa/pay`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,amount:selectedPlan.price,plan:selectedPlan.plan,name,company})});
+    const data=await res.json();
+    if(data.success){
+      setPayStatus('pending','STK Push sent! Enter your M-Pesa PIN on your phone.',true);
+      pollPayment(data.checkoutRequestId,0);
+    }else{setPayStatus('error',data.message||'Payment initiation failed.',false);$('btn-pay').disabled=false;}
+  }catch(e){setPayStatus('error','Cannot reach payment server. Start your backend with: node backend/server.js',false);$('btn-pay').disabled=false;}
+}
+
+function pollPayment(id,n){
+  if(n>=12){setPayStatus('error','Timed out. If you paid, contact support with your M-Pesa code.',false);$('btn-pay').disabled=false;return;}
+  clearTimeout(pollTimer);
+  pollTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch(`${BACKEND_URL}/api/mpesa/status/${id}`),{status}=await r.json();
+      if(status==='success'){setPayStatus('success',selectedPlan.plan.charAt(0).toUpperCase()+selectedPlan.plan.slice(1)+' plan activated! Welcome.',false);$('btn-pay').disabled=false;}
+      else if(status==='failed'){setPayStatus('error','Payment cancelled or declined. Try again.',false);$('btn-pay').disabled=false;}
+      else pollPayment(id,n+1);
+    }catch{pollPayment(id,n+1);}
+  },3000);
+}
+
+$('modal-confirm').addEventListener('click',()=>{$('exit-modal').classList.remove('show');clearInterval(state.timer);showScreen('start');});
+$('modal-cancel').addEventListener('click',()=>$('exit-modal').classList.remove('show'));
+$('btn-start').addEventListener('click',startQuiz);
+$('btn-next').addEventListener('click',nextQuestion);
+$('btn-restart').addEventListener('click',startQuiz);
+$('btn-quit').addEventListener('click',()=>showScreen('start'));
+$('btn-show-pricing').addEventListener('click',()=>showScreen('pricing'));
+$('btn-back-pricing').addEventListener('click',()=>showScreen('start'));
+
+document.addEventListener('keydown',e=>{
+  if(screens.quiz.classList.contains('active')){
+    if(e.key==='Escape')$('exit-modal').classList.add('show');
+    const i=['1','2','3','4'].indexOf(e.key);
+    if(i!==-1&&!state.answered){const o=document.querySelectorAll('.option');if(o[i])o[i].click();}
+    if((e.key==='Enter'||e.key===' ')&&$('btn-next').classList.contains('show')){e.preventDefault();nextQuestion();}
+  }
+});
 </script>
 </body>
 </html>
