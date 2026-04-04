@@ -2,7 +2,10 @@
 
 A fast-paced, interactive web dev quiz app built with vanilla HTML, CSS, and JavaScript. Test your knowledge of HTML, CSS, PHP, SQL, XML, and React — beat the clock, chain streaks, and review your answers at the end.
 
-![Quiz Arena](https://img.shields.io/badge/status-live-brightgreen) ![HTML](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
+![M-Pesa](https://img.shields.io/badge/M--Pesa-00A859?logo=safaricom&logoColor=white)
+![AI](https://img.shields.io/badge/AI--Powered-7C3AED?logo=anthropic&logoColor=white)
 
 ---
 
