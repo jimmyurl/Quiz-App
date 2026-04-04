@@ -796,7 +796,7 @@
 
   <div class="pricing-header">
     <div class="pricing-title">Corporate <span>Plans</span></div>
-    <div class="pricing-sub">Subscribe for full access to all interview categories. Pay securely via M-Pesa.</div>
+    <div class="pricing-sub">Subscribe for full access to all interview categories. Pay via M-Pesa, Airtel, Tigo, or card.</div>
   </div>
 
   <div class="plans-grid">
@@ -855,7 +855,7 @@
       </div>
     </div>
     <div class="form-row">
-      <label class="form-label">M-Pesa phone number</label>
+      <label class="form-label">Mobile phone number</label>
       <div class="phone-wrap">
         <div class="phone-prefix">+255</div>
         <input class="form-input" id="inp-phone" type="tel" placeholder="712 345 678" maxlength="9" style="flex:1"/>
@@ -867,19 +867,19 @@
       <div class="order-row total"><span class="order-label">Total due today</span><span class="order-val" id="sum-total">TZS 150,000</span></div>
     </div>
     <button class="btn-pay" id="btn-pay" onclick="handlePay()">
-      <span class="mpesa-badge" id="pay-badge">M-PESA</span>
+      <span class="mpesa-badge" id="pay-badge">SELCOM PAY</span>
       <span id="btn-pay-text">Pay TZS 150,000</span>
     </button>
     <div class="pay-status" id="pay-status">
       <div id="pay-icon" class="spinner"></div>
       <div id="pay-msg"></div>
     </div>
-    <div class="secure-note"><i class="fas fa-lock" style="font-size:10px;margin-right:4px;"></i>Secured by Safaricom Daraja &middot; Your PIN is never shared with us</div>
+    <div class="secure-note"><i class="fas fa-lock" style="font-size:10px;margin-right:4px;"></i>Secured by Selcom Payment Gateway &middot; Supports M-Pesa, Airtel, Tigo, Halo &amp; card</div>
   </div>
 </div>
 
 <script>
-const BACKEND_URL = 'http://localhost:3000';
+const BACKEND_URL = 'http://localhost:3000'; // change to your deployed URL in production
 const CONFIG = { timePerQuestion: 20, questionsPerSession: 8 };
 const LABELS = ['A','B','C','D'];
 
@@ -1301,15 +1301,15 @@ function switchLeaderboard(tab, el) {
   }
 }
 
-/* ── Pricing & M-Pesa ── */
+/* ── Pricing & Selcom ── */
 function selectPlan(el) {
   document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  const plan = el.dataset.plan;
+  const plan  = el.dataset.plan;
   const price = parseInt(el.dataset.price);
   selectedPlan = { plan, price };
-  $('sum-plan').textContent = el.querySelector('.plan-name').textContent;
-  $('sum-total').textContent = price === 0 ? 'Free' : `TZS ${price.toLocaleString()}`;
+  $('sum-plan').textContent    = el.querySelector('.plan-name').textContent;
+  $('sum-total').textContent   = price === 0 ? 'Free' : `TZS ${price.toLocaleString()}`;
   $('btn-pay-text').textContent = price === 0 ? 'Activate Free Plan' : `Pay TZS ${price.toLocaleString()}`;
   $('pay-badge').style.display = price === 0 ? 'none' : 'inline-block';
   setPayStatus('', '', false);
@@ -1326,62 +1326,108 @@ function setPayStatus(type, msg, show) {
 }
 
 async function handlePay() {
+  // Free plan — no payment needed
   if (selectedPlan.price === 0) {
     setPayStatus('success', '✅ Free plan activated! You can now access 2 categories.', true);
     return;
   }
-  const name = $('inp-name').value.trim();
+
+  const name    = $('inp-name').value.trim();
   const company = $('inp-company').value.trim();
-  const phone = $('inp-phone').value.replace(/\s/g, '');
-  if (!name || !company) { setPayStatus('error', 'Please fill in your name and company.', true); return; }
-  if (!phone || phone.length < 9) { setPayStatus('error', 'Enter a valid M-Pesa phone number (9 digits after +255).', true); return; }
+  const phone   = $('inp-phone').value.replace(/\s/g, '');
+
+  if (!name || !company) {
+    setPayStatus('error', 'Please fill in your name and company.', true);
+    return;
+  }
+  if (!phone || phone.length < 9) {
+    setPayStatus('error', 'Enter a valid phone number (9 digits after +255).', true);
+    return;
+  }
 
   $('btn-pay').disabled = true;
-  setPayStatus('pending', `STK Push sent to +255${phone}. Enter your M-Pesa PIN to confirm.`, true);
+  setPayStatus('pending', 'Creating payment order…', true);
 
   try {
-    const res = await fetch(`${BACKEND_URL}/api/mpesa/pay`, {
-      method: 'POST',
+    // Step 1 — Ask backend to create a Selcom Checkout order
+    const res = await fetch(`${BACKEND_URL}/api/payment/create-order`, {
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, amount: selectedPlan.price, plan: selectedPlan.plan, name, company })
+      body: JSON.stringify({
+        phone,
+        name,
+        company,
+        plan:   selectedPlan.plan,
+        amount: selectedPlan.price,
+      }),
     });
+
     const data = await res.json();
-    if (data.success) {
-      pollPaymentStatus(data.checkoutRequestId);
-    } else {
+
+    if (!data.success) {
       setPayStatus('error', data.message || 'Payment initiation failed.', true);
       $('btn-pay').disabled = false;
+      return;
     }
+
+    // Step 2 — Open the Selcom payment page in a new tab.
+    // The customer pays there using M-Pesa, Airtel, Tigo, card — their choice.
+    const gatewayWindow = window.open(data.gatewayUrl, '_blank');
+
+    if (gatewayWindow) {
+      setPayStatus('pending',
+        '🔗 Payment page opened in a new tab. Complete your payment there, then return here — this page will update automatically.',
+        true
+      );
+    } else {
+      // Pop-up was blocked — show a clickable link instead
+      const el = $('pay-status');
+      el.className = 'pay-status show pending';
+      $('pay-icon').className = 'spinner';
+      $('pay-msg').innerHTML = `Pop-up blocked. <a href="${data.gatewayUrl}" target="_blank" style="color:inherit;font-weight:600;text-decoration:underline;">Click here to open payment page</a>, then return here.`;
+    }
+
+    // Step 3 — Poll backend every 3 s; backend checks Selcom and activates
+    //           the subscription once it receives Selcom's webhook callback.
+    pollOrderStatus(data.order_id);
+
   } catch (e) {
-    setPayStatus('error', 'Cannot reach payment server. Make sure the backend is running: node backend/server.js', true);
+    setPayStatus('error', 'Cannot reach payment server. Make sure the backend is running: node server.js', true);
     $('btn-pay').disabled = false;
   }
 }
 
-function pollPaymentStatus(id) {
+function pollOrderStatus(order_id) {
   let attempts = 0;
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
     attempts++;
-    if (attempts > 20) {
+
+    // Stop polling after ~5 minutes (100 × 3 s)
+    if (attempts > 100) {
       clearInterval(pollTimer);
-      setPayStatus('error', 'Payment timed out. Please try again.', true);
+      setPayStatus('error', 'Timed out waiting for payment confirmation. If you completed payment, please contact support.', true);
       $('btn-pay').disabled = false;
       return;
     }
+
     try {
-      const r = await fetch(`${BACKEND_URL}/api/mpesa/status/${id}`);
-      const { status } = await r.json();
+      const r = await fetch(`${BACKEND_URL}/api/payment/status/${order_id}`);
+      const { status, plan } = await r.json();
+
       if (status === 'success') {
         clearInterval(pollTimer);
-        setPayStatus('success', `🎉 Payment confirmed! Your ${selectedPlan.plan} plan is now active.`, true);
+        setPayStatus('success', `🎉 Payment confirmed! Your ${plan} plan is now active.`, true);
         $('btn-pay').disabled = false;
-      } else if (status === 'failed') {
+      } else if (status === 'failed' || status === 'cancelled') {
         clearInterval(pollTimer);
         setPayStatus('error', 'Payment was declined or cancelled. Please try again.', true);
         $('btn-pay').disabled = false;
       }
-    } catch(e) {}
+      // status === 'pending' → keep polling silently
+    } catch (e) {
+      // Network blip — keep polling
+    }
   }, 3000);
 }
 
