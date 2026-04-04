@@ -12,7 +12,7 @@
 
 ## What is this?
 
-HireReady is a B2B SaaS platform where Tanzanian companies subscribe to assess job candidates and train employees across 12 professional categories. Unlike static quiz apps, every session hits the Claude API to generate contextually fresh questions — so candidates can't memorise answers between attempts.
+Quiz Arena is a B2B SaaS platform where Tanzanian companies subscribe to assess job candidates and train employees across 12 professional categories. Unlike static quiz apps, every session hits the Claude API to generate contextually fresh questions — so candidates can't memorise answers between attempts.
 
 Companies pay via Selcom's unified checkout (M-Pesa, Airtel Money, Tigo Pesa, and card in one flow), manage team assessments from an HR admin dashboard, and track performance on a live company leaderboard.
 
