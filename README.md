@@ -1,6 +1,6 @@
 # ⚡ Quiz Arena
 
-A fast-paced, interactive web dev quiz app built with vanilla HTML, CSS, and JavaScript. Test your knowledge of HTML, CSS, PHP, SQL, XML, and React — beat the clock, chain streaks, and review your answers at the end.
+A B2B SaaS quiz platform where companies subscribe to assess employees and candidates using AI-generated interview questions across 12 job categories, with M-Pesa payment and a leaderboard.
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
